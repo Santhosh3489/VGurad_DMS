@@ -1,0 +1,996 @@
+// .card {
+//     background: white;
+//     border-radius: 12px;
+//     padding: 20px;
+//     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+//     transition: all 0.3s ease;
+//     cursor: pointer;
+//     position: relative;
+//     height: 100%;
+//     display: flex;
+//     flex-direction: column;
+
+//     &:hover {
+//         box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+//         transform: translateY(-2px);
+//     }
+// }
+
+// .cardHeader {
+//     display: flex;
+//     justify-content: space-between;
+//     align-items: flex-start;
+//     margin-bottom: 16px;
+
+//     .iconWrapper {
+//         width: 40px;
+//         height: 40px;
+//         border-radius: 8px;
+//         background-color: #f5f5f5;
+//         display: flex;
+//         align-items: center;
+//         justify-content: center;
+//         flex-shrink: 0;
+
+//         .fileIcon {
+//             color: #666;
+//         }
+//     }
+
+//     .menuWrapper {
+//         position: relative;
+
+//         .menuButton {
+//             background: none;
+//             border: none;
+//             cursor: pointer;
+//             padding: 4px;
+//             border-radius: 4px;
+//             display: flex;
+//             align-items: center;
+//             justify-content: center;
+//             color: #666;
+//             transition: all 0.2s ease;
+
+//             &:hover {
+//                 background-color: #f5f5f5;
+//             }
+
+//             &:active {
+//                 background-color: #e8e8e8;
+//             }
+//         }
+//     }
+// }
+
+// .cardBody {
+//     flex: 1;
+//     display: flex;
+//     flex-direction: column;
+//     gap: 8px;
+
+//     .documentName {
+//         font-size: 16px;
+//         font-weight: 600;
+//         color: #333;
+//         margin: 0 0 8px 0;
+//         line-height: 1.4;
+//         overflow: hidden;
+//         text-overflow: ellipsis;
+//         word-break: break-word;
+//     }
+
+//     .requestId {
+//         font-size: 12px;
+//         color: #999;
+//         font-weight: 500;
+//         text-transform: uppercase;
+//         letter-spacing: 0.5px;
+//     }
+
+//     .requestInfo {
+//         display: flex;
+//         align-items: center;
+//         gap: 8px;
+//         margin-bottom: 8px;
+//         font-size: 13px;
+
+//         .dateLabel {
+//             color: #999;
+//             font-weight: 400;
+//         }
+
+//         .dateValue {
+//             color: #666;
+//             font-weight: 500;
+//         }
+//     }
+
+//     .statusBadge {
+//         display: inline-flex;
+//         align-items: center;
+//         gap: 6px;
+//         padding: 6px 12px;
+//         border-radius: 6px;
+//         font-size: 13px;
+//         font-weight: 500;
+//         width: fit-content;
+//         margin-top: auto;
+
+//         &.statusPending {
+//             background-color: #fff7e6;
+//             color: #fa8c16;
+
+//             svg {
+//                 color: #fa8c16;
+//             }
+//         }
+
+//         &.statusApproved {
+//             background-color: #f6ffed;
+//             color: #52c41a;
+
+//             svg {
+//                 color: #52c41a;
+//             }
+//         }
+
+//         &.statusRejected {
+//             background-color: #fff2e8;
+//             color: #ff4d4f;
+
+//             svg {
+//                 color: #ff4d4f;
+//             }
+//         }
+//     }
+// }
+
+// // Responsive design
+// @media (max-width: 480px) {
+//     .card {
+//         padding: 16px;
+//     }
+
+//     .cardBody {
+//         .documentName {
+//             font-size: 15px;
+//         }
+
+//         .requestInfo {
+//             font-size: 12px;
+//         }
+
+//         .statusBadge {
+//             font-size: 12px;
+//             padding: 5px 10px;
+//         }
+//     }
+// }
+
+
+
+// .menu {
+//     position: absolute;
+//     top: 100%;
+//     right: 0;
+//     margin-top: 4px;
+//     background: white;
+//     border-radius: 8px;
+//     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+//     min-width: 200px;
+//     overflow: hidden;
+//     z-index: 1000;
+//     animation: slideDown 0.2s ease;
+
+//     @keyframes slideDown {
+//         from {
+//             opacity: 0;
+//             transform: translateY(-8px);
+//         }
+//         to {
+//             opacity: 1;
+//             transform: translateY(0);
+//         }
+//     }
+
+//     .menuItem {
+//         width: 100%;
+//         display: flex;
+//         align-items: center;
+//         gap: 12px;
+//         padding: 12px 16px;
+//         border: none;
+//         background: white;
+//         cursor: pointer;
+//         font-size: 14px;
+//         color: #333;
+//         transition: all 0.2s ease;
+//         text-align: left;
+//         font-family: inherit;
+
+//         svg {
+//             color: #666;
+//             flex-shrink: 0;
+//         }
+
+//         &:hover {
+//             background-color: #f9f9f9;
+//             color: #fa8c16;
+
+//             svg {
+//                 color: #fa8c16;
+//             }
+//         }
+
+//         &:active {
+//             background-color: #f0f0f0;
+//         }
+
+//         &:not(:last-child) {
+//             border-bottom: 1px solid #f0f0f0;
+//         }
+
+//         &:first-child {
+//             border-top-left-radius: 8px;
+//             border-top-right-radius: 8px;
+//         }
+
+//         &:last-child {
+//             border-bottom-left-radius: 8px;
+//             border-bottom-right-radius: 8px;
+//         }
+//     }
+// }
+
+// // Mobile responsive
+// @media (max-width: 480px) {
+//     .menu {
+//         min-width: 180px;
+
+//         .menuItem {
+//             padding: 10px 14px;
+//             font-size: 13px;
+
+//             svg {
+//                 width: 16px;
+//                 height: 16px;
+//             }
+//         }
+//     }
+// }
+
+
+// .overlay {
+//     position: fixed;
+//     top: 0;
+//     left: 0;
+//     right: 0;
+//     bottom: 0;
+//     background: rgba(0, 0, 0, 0.5);
+//     display: flex;
+//     align-items: center;
+//     justify-content: center;
+//     z-index: 2000;
+//     padding: 20px;
+//     animation: fadeIn 0.2s ease;
+
+//     @keyframes fadeIn {
+//         from {
+//             opacity: 0;
+//         }
+//         to {
+//             opacity: 1;
+//         }
+//     }
+// }
+
+// .modal {
+//     background: white;
+//     border-radius: 12px;
+//     width: 90%;
+//     max-width: 500px;
+//     max-height: 85vh;
+//     overflow: hidden;
+//     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+//     animation: slideUp 0.3s ease;
+//     display: flex;
+//     flex-direction: column;
+
+//     @keyframes slideUp {
+//         from {
+//             opacity: 0;
+//             transform: translateY(20px);
+//         }
+//         to {
+//             opacity: 1;
+//             transform: translateY(0);
+//         }
+//     }
+// }
+
+// .header {
+//     display: flex;
+//     justify-content: space-between;
+//     align-items: flex-start;
+//     padding: 24px;
+//     border-bottom: 1px solid #f0f0f0;
+//     flex-shrink: 0;
+
+//     .title {
+//         font-size: 20px;
+//         font-weight: 600;
+//         color: #333;
+//         margin: 0 0 6px 0;
+//     }
+
+//     .subtitle {
+//         font-size: 14px;
+//         color: #666;
+//         margin: 0 0 4px 0;
+//         word-break: break-word;
+//     }
+
+//     .requestId {
+//         font-size: 12px;
+//         color: #999;
+//         font-weight: 500;
+//         text-transform: uppercase;
+//         letter-spacing: 0.5px;
+//         margin: 0;
+//     }
+
+//     .closeBtn {
+//         background: none;
+//         border: none;
+//         cursor: pointer;
+//         padding: 6px;
+//         border-radius: 6px;
+//         color: #666;
+//         display: flex;
+//         align-items: center;
+//         justify-content: center;
+//         transition: all 0.2s ease;
+//         flex-shrink: 0;
+//         margin-left: 16px;
+
+//         &:hover {
+//             background-color: #f5f5f5;
+//             color: #333;
+//         }
+
+//         &:active {
+//             background-color: #e8e8e8;
+//         }
+//     }
+// }
+
+// .timeline {
+//     padding: 24px;
+//     overflow-y: auto;
+//     flex: 1;
+// }
+
+// .timelineItem {
+//     display: flex;
+//     gap: 16px;
+//     position: relative;
+
+//     &:not(:last-child) {
+//         margin-bottom: 32px;
+//     }
+
+//     &:last-child {
+//         .iconContainer .connector {
+//             display: none;
+//         }
+//     }
+// }
+
+// .iconContainer {
+//     position: relative;
+//     flex-shrink: 0;
+//     display: flex;
+//     flex-direction: column;
+//     align-items: center;
+
+//     .iconApproved {
+//         color: #52c41a;
+//         background: #f6ffed;
+//         border-radius: 50%;
+//         padding: 6px;
+//         border: 2px solid #b7eb8f;
+//     }
+
+//     .iconPending {
+//         color: #fa8c16;
+//         background: #fff7e6;
+//         border-radius: 50%;
+//         padding: 6px;
+//         border: 2px solid #ffd591;
+//     }
+
+//     .iconRejected {
+//         color: #ff4d4f;
+//         background: #fff2e8;
+//         border-radius: 50%;
+//         padding: 6px;
+//         border: 2px solid #ffbb96;
+//     }
+
+//     .iconNotReached {
+//         color: #d9d9d9;
+//         background: #fafafa;
+//         border-radius: 50%;
+//         padding: 6px;
+//         border: 2px solid #e8e8e8;
+//     }
+
+//     .connector {
+//         position: absolute;
+//         left: 50%;
+//         top: 36px;
+//         transform: translateX(-50%);
+//         width: 2px;
+//         height: 50px;
+//         background-color: #e8e8e8;
+//         transition: background-color 0.3s ease;
+
+//         &.connectorActive {
+//             background: linear-gradient(180deg, #52c41a 0%, #95de64 100%);
+//         }
+//     }
+// }
+
+// .content {
+//     flex: 1;
+//     padding-top: 4px;
+//     min-width: 0;
+
+//     .levelHeader {
+//         display: flex;
+//         align-items: center;
+//         gap: 10px;
+//         margin-bottom: 10px;
+//         flex-wrap: wrap;
+
+//         .levelLabel {
+//             font-size: 15px;
+//             font-weight: 600;
+//             color: #333;
+//         }
+//     }
+
+//     .badgeApproved {
+//         display: inline-block;
+//         padding: 4px 12px;
+//         border-radius: 4px;
+//         font-size: 12px;
+//         font-weight: 500;
+//         background-color: #f6ffed;
+//         color: #52c41a;
+//         border: 1px solid #b7eb8f;
+//     }
+
+//     .badgePending {
+//         display: inline-block;
+//         padding: 4px 12px;
+//         border-radius: 4px;
+//         font-size: 12px;
+//         font-weight: 500;
+//         background-color: #fff7e6;
+//         color: #fa8c16;
+//         border: 1px solid #ffd591;
+//     }
+
+//     .badgeRejected {
+//         display: inline-block;
+//         padding: 4px 12px;
+//         border-radius: 4px;
+//         font-size: 12px;
+//         font-weight: 500;
+//         background-color: #fff2e8;
+//         color: #ff4d4f;
+//         border: 1px solid #ffbb96;
+//     }
+
+//     .approverInfo {
+//         margin-bottom: 8px;
+
+//         .approverName {
+//             font-size: 14px;
+//             font-weight: 500;
+//             color: #333;
+//             margin: 0 0 4px 0;
+//         }
+
+//         .approverRole {
+//             font-size: 13px;
+//             color: #fa8c16;
+//             margin: 0;
+//             font-weight: 500;
+//         }
+//     }
+
+//     .timestamp {
+//         font-size: 12px;
+//         color: #999;
+//         margin: 6px 0 0 0;
+//     }
+
+//     .awaitingText {
+//         font-size: 13px;
+//         color: #999;
+//         font-style: italic;
+//         margin: 6px 0 0 0;
+//     }
+
+//     .comments {
+//         font-size: 13px;
+//         color: #666;
+//         margin: 8px 0 0 0;
+//         padding: 10px;
+//         background-color: #fafafa;
+//         border-left: 3px solid #ff4d4f;
+//         border-radius: 4px;
+//         line-height: 1.5;
+
+//         strong {
+//             color: #333;
+//             font-weight: 600;
+//         }
+//     }
+// }
+
+// // Mobile responsive
+// @media (max-width: 768px) {
+//     .modal {
+//         width: 95%;
+//         max-height: 90vh;
+//     }
+
+//     .header {
+//         padding: 20px;
+
+//         .title {
+//             font-size: 18px;
+//         }
+
+//         .subtitle {
+//             font-size: 13px;
+//         }
+//     }
+
+//     .timeline {
+//         padding: 20px;
+//     }
+
+//     .timelineItem {
+//         gap: 12px;
+
+//         &:not(:last-child) {
+//             margin-bottom: 28px;
+//         }
+//     }
+
+//     .iconContainer {
+//         .iconApproved,
+//         .iconPending,
+//         .iconRejected,
+//         .iconNotReached {
+//             padding: 5px;
+
+//             svg {
+//                 width: 20px;
+//                 height: 20px;
+//             }
+//         }
+
+//         .connector {
+//             height: 45px;
+//         }
+//     }
+
+//     .content {
+//         .levelHeader {
+//             .levelLabel {
+//                 font-size: 14px;
+//             }
+//         }
+
+//         .badgeApproved,
+//         .badgePending,
+//         .badgeRejected {
+//             font-size: 11px;
+//             padding: 3px 10px;
+//         }
+
+//         .approverInfo {
+//             .approverName {
+//                 font-size: 13px;
+//             }
+
+//             .approverRole {
+//                 font-size: 12px;
+//             }
+//         }
+
+//         .timestamp,
+//         .awaitingText {
+//             font-size: 11px;
+//         }
+
+//         .comments {
+//             font-size: 12px;
+//             padding: 8px;
+//         }
+//     }
+// }
+
+// @media (max-width: 480px) {
+//     .overlay {
+//         padding: 10px;
+//     }
+
+//     .modal {
+//         width: 100%;
+//         max-height: 95vh;
+//     }
+
+//     .header {
+//         padding: 16px;
+
+//         .title {
+//             font-size: 17px;
+//         }
+
+//         .subtitle {
+//             font-size: 12px;
+//         }
+
+//         .requestId {
+//             font-size: 11px;
+//         }
+//     }
+
+//     .timeline {
+//         padding: 16px;
+//     }
+// }
+
+
+// .overlay {
+//     position: fixed;
+//     top: 0;
+//     left: 0;
+//     right: 0;
+//     bottom: 0;
+//     background: rgba(0, 0, 0, 0.6);
+//     display: flex;
+//     align-items: center;
+//     justify-content: center;
+//     z-index: 2000;
+//     padding: 20px;
+//     animation: fadeIn 0.2s ease;
+
+//     @keyframes fadeIn {
+//         from {
+//             opacity: 0;
+//         }
+//         to {
+//             opacity: 1;
+//         }
+//     }
+// }
+
+// .modal {
+//     background: white;
+//     border-radius: 12px;
+//     width: 90%;
+//     max-width: 1100px;
+//     height: 85vh;
+//     display: flex;
+//     flex-direction: column;
+//     overflow: hidden;
+//     box-shadow: 0 12px 48px rgba(0, 0, 0, 0.2);
+//     animation: slideUp 0.3s ease;
+
+//     @keyframes slideUp {
+//         from {
+//             opacity: 0;
+//             transform: scale(0.95);
+//         }
+//         to {
+//             opacity: 1;
+//             transform: scale(1);
+//         }
+//     }
+// }
+
+// .header {
+//     display: flex;
+//     justify-content: space-between;
+//     align-items: center;
+//     padding: 20px 24px;
+//     border-bottom: 1px solid #f0f0f0;
+//     flex-shrink: 0;
+//     background: white;
+//     gap: 16px;
+
+//     .titleSection {
+//         display: flex;
+//         align-items: center;
+//         gap: 12px;
+//         min-width: 0;
+//         flex: 1;
+
+//         .fileIcon {
+//             color: #fa8c16;
+//             flex-shrink: 0;
+//         }
+
+//         .title {
+//             font-size: 18px;
+//             font-weight: 600;
+//             color: #333;
+//             margin: 0;
+//             overflow: hidden;
+//             text-overflow: ellipsis;
+//             white-space: nowrap;
+//         }
+//     }
+
+//     .headerActions {
+//         display: flex;
+//         gap: 8px;
+//         flex-shrink: 0;
+//     }
+
+//     .actionBtn,
+//     .closeBtn {
+//         background: none;
+//         border: none;
+//         cursor: pointer;
+//         padding: 8px;
+//         border-radius: 6px;
+//         color: #666;
+//         display: flex;
+//         align-items: center;
+//         justify-content: center;
+//         transition: all 0.2s ease;
+
+//         &:hover:not(:disabled) {
+//             background-color: #f5f5f5;
+//             color: #333;
+//         }
+
+//         &:active:not(:disabled) {
+//             background-color: #e8e8e8;
+//         }
+
+//         &:disabled {
+//             opacity: 0.4;
+//             cursor: not-allowed;
+//         }
+//     }
+
+//     .actionBtn:hover:not(:disabled) {
+//         color: #fa8c16;
+//     }
+// }
+
+// .previewContainer {
+//     flex: 1;
+//     overflow: hidden;
+//     background-color: #f5f5f5;
+//     position: relative;
+//     display: flex;
+//     align-items: center;
+//     justify-content: center;
+
+//     .iframe {
+//         width: 100%;
+//         height: 100%;
+//         border: none;
+//         background: white;
+//     }
+
+//     .imagePreview {
+//         width: 100%;
+//         height: 100%;
+//         display: flex;
+//         align-items: center;
+//         justify-content: center;
+//         padding: 20px;
+//         background: #f5f5f5;
+
+//         img {
+//             max-width: 100%;
+//             max-height: 100%;
+//             object-fit: contain;
+//             border-radius: 8px;
+//             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+//         }
+//     }
+
+//     .loadingOverlay {
+//         position: absolute;
+//         top: 0;
+//         left: 0;
+//         right: 0;
+//         bottom: 0;
+//         background: white;
+//         display: flex;
+//         flex-direction: column;
+//         align-items: center;
+//         justify-content: center;
+//         gap: 16px;
+//         z-index: 10;
+
+//         .spinner {
+//             width: 40px;
+//             height: 40px;
+//             border: 4px solid #f0f0f0;
+//             border-top-color: #fa8c16;
+//             border-radius: 50%;
+//             animation: spin 1s linear infinite;
+//         }
+
+//         p {
+//             color: #666;
+//             font-size: 14px;
+//             margin: 0;
+//         }
+
+//         @keyframes spin {
+//             to {
+//                 transform: rotate(360deg);
+//             }
+//         }
+//     }
+
+//     .noPreview,
+//     .errorPreview {
+//         display: flex;
+//         flex-direction: column;
+//         align-items: center;
+//         justify-content: center;
+//         height: 100%;
+//         color: #999;
+//         font-size: 16px;
+//         gap: 16px;
+//         padding: 40px;
+//         text-align: center;
+
+//         svg {
+//             opacity: 0.5;
+//             color: #999;
+//         }
+
+//         p {
+//             margin: 0;
+//             color: #666;
+//         }
+//     }
+
+//     .errorPreview {
+//         .retryBtn {
+//             padding: 10px 20px;
+//             background-color: #fa8c16;
+//             color: white;
+//             border: none;
+//             border-radius: 6px;
+//             font-size: 14px;
+//             font-weight: 500;
+//             cursor: pointer;
+//             transition: all 0.3s ease;
+//             margin-top: 8px;
+
+//             &:hover {
+//                 background-color: #d87205;
+//             }
+
+//             &:active {
+//                 transform: scale(0.98);
+//             }
+//         }
+//     }
+// }
+
+// // Mobile responsive
+// @media (max-width: 768px) {
+//     .overlay {
+//         padding: 10px;
+//     }
+
+//     .modal {
+//         width: 95%;
+//         height: 90vh;
+//     }
+
+//     .header {
+//         padding: 16px 20px;
+//         flex-wrap: wrap;
+
+//         .titleSection {
+//             .fileIcon {
+//                 width: 18px;
+//                 height: 18px;
+//             }
+
+//             .title {
+//                 font-size: 16px;
+//             }
+//         }
+
+//         .headerActions {
+//             gap: 6px;
+
+//             .actionBtn,
+//             .closeBtn {
+//                 padding: 6px;
+
+//                 svg {
+//                     width: 16px;
+//                     height: 16px;
+//                 }
+//             }
+//         }
+//     }
+
+//     .previewContainer {
+//         .loadingOverlay {
+//             .spinner {
+//                 width: 32px;
+//                 height: 32px;
+//             }
+
+//             p {
+//                 font-size: 13px;
+//             }
+//         }
+
+//         .noPreview,
+//         .errorPreview {
+//             font-size: 14px;
+//             gap: 12px;
+//             padding: 30px 20px;
+
+//             svg {
+//                 width: 40px;
+//                 height: 40px;
+//             }
+//         }
+
+//         .errorPreview {
+//             .retryBtn {
+//                 font-size: 13px;
+//                 padding: 8px 16px;
+//             }
+//         }
+//     }
+// }
+
+// @media (max-width: 480px) {
+//     .modal {
+//         width: 100%;
+//         height: 95vh;
+//         border-radius: 8px;
+//     }
+
+//     .header {
+//         padding: 14px 16px;
+
+//         .titleSection {
+//             .title {
+//                 font-size: 15px;
+//             }
+//         }
+//     }
+
+//     .previewContainer {
+//         .imagePreview {
+//             padding: 10px;
+//         }
+//     }
+// }

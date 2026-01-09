@@ -1,0 +1,92 @@
+// Menu Dropdown Styles (for RequestCardMenu)
+.menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 4px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    min-width: 200px;
+    overflow: hidden;
+    z-index: 1000;
+    animation: slideDown 0.2s ease;
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-8px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .menuItem {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        border: none;
+        background: white;
+        cursor: pointer;
+        font-size: 14px;
+        color: #333;
+        transition: all 0.2s ease;
+        text-align: left;
+        font-family: inherit;
+
+        svg {
+            color: #666;
+            flex-shrink: 0;
+        }
+
+        &:hover {
+            background-color: #f9f9f9;
+            color: #fa8c16;
+
+            svg {
+                color: #fa8c16;
+            }
+        }
+
+        &:active {
+            background-color: #f0f0f0;
+        }
+
+        &:not(:last-child) {
+            border-bottom: 1px solid #f0f0f0;
+        }
+    }
+}
+
+// Mobile Responsive for Menu
+@media (max-width: 768px) {
+    .menu {
+        min-width: 180px;
+
+        .menuItem {
+            padding: 10px 14px;
+            font-size: 13px;
+
+            svg {
+                width: 14px;
+                height: 14px;
+            }
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .menu {
+        min-width: 160px;
+        right: -8px;
+
+        .menuItem {
+            padding: 8px 12px;
+            gap: 10px;
+        }
+    }
+}

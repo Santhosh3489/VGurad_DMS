@@ -1,0 +1,19 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "useGulp": false,
+    "plusBeta": false,
+    "isCreatingSolution": true,
+    "nodeVersion": "22.14.0",
+    "sdksVersions": {},
+    "version": "1.22.1",
+    "libraryName": "v-guard-dms",
+    "libraryId": "e1a00fb3-a45c-44a7-975a-82b112639464",
+    "environment": "spo",
+    "packageManager": "npm",
+    "solutionName": "VGuard_DMS",
+    "solutionShortDescription": "VGuard_DMS description",
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "componentType": "webpart"
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "v-guard-dms-client-side-solution",
+    "id": "e1a00fb3-a45c-44a7-975a-82b112639464",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.22.1"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "VGuard_DMS description"
+      },
+      "longDescription": {
+        "default": "VGuard_DMS description"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "v-guard-dms Feature",
+        "description": "The feature that activates elements of the v-guard-dms solution.",
+        "id": "2138a87c-b4ef-457b-840e-3c771b498774",
+        "version": "1.0.0.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/v-guard-dms.sppkg"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "extends": "./node_modules/@microsoft/spfx-web-build-rig/profiles/default/tsconfig-base.json",
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "noImplicitAny": false,
+    "noUnusedLocals": false,
+    "strictNullChecks": false,
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "paths": {
+      "antd": [
+        "node_modules/antd"
+      ],
+      "antd/*": [
+        "node_modules/antd/*"
+      ]
+    }
+  }
+}
