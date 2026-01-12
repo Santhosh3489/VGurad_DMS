@@ -21,8 +21,9 @@ const RequestCardMenu: React.FC<IRequestCardMenuProps> = ({ request, onClose }) 
     }
 
     const handleTrackProgressClick = () => {
-        setShowProgressModal(true);
         onClose();
+        setShowProgressModal(true);
+       console.log("RequestId passed to modal:", request.RequestId);
     }
 
     return (

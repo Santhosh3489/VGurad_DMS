@@ -1,11 +1,12 @@
 import * as React from 'react';
-import { X, Upload, File, CheckCircle, AlertCircle, Loader } from 'lucide-react';
+import { X, Upload, File as FileIcon, CheckCircle, AlertCircle, Loader } from 'lucide-react';
 import { IUploadModalProps } from './ModalConfig';
 import styles from '../Styles/UploadModal.module.scss'
 import { SPFI } from "@pnp/sp";
 import { getSP } from '../../../../Config/pnpConfig';
 import { getCurrentUser } from '../../../../Service/commonService';
 import { createDMSRequest } from '../MyRequest/service';
+
 
 const UploadModal: React.FC<IUploadModalProps> = ({ 
     isOpen, 
@@ -118,9 +119,8 @@ const UploadModal: React.FC<IUploadModalProps> = ({
                 { Overwrite: true }
             )
 
-            const fileUrl = uploadResult.ServerRelativeUrl;
-            console.log('File uploaded successfully to:', fileUrl);
-
+           const fileUrl = uploadResult.ServerRelativeUrl;
+           
             //create DMS requst with approval workflow
             const requestId = await createDMSRequest({
                 folderURL: fileUrl,
@@ -129,6 +129,15 @@ const UploadModal: React.FC<IUploadModalProps> = ({
             });
 
             console.log(`DMS request ${requestId} created successfully`);
+            const spFile = sp.web.getFileByServerRelativePath(fileUrl);
+           
+            const fileItem = await spFile.getItem();
+            await fileItem.update({
+                RequestId: requestId,
+                Status: "L1 Approval Pending"
+            })
+            console.log('File uploaded successfully to:', fileUrl);
+            
 
             setUploadStatus('success');
             setUploading(false);
@@ -217,7 +226,7 @@ const UploadModal: React.FC<IUploadModalProps> = ({
                     ) : (
                         <div className={styles.filePreview}>
                             <div className={styles.fileIcon}>
-                                <File size={40} />
+                                <FileIcon size={40} />
                             </div>
                             <div className={styles.fileInfo}>
                                 <h3 className={styles.fileName}>{selectedFile.name}</h3>

@@ -1,318 +1,200 @@
 .overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 999999;
-    padding: 20px;
-    animation: fadeIn 0.2s ease;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
 
-    @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-    }
 }
 
 .modal {
-    background: white;
-    border-radius: 12px;
-    width: 90%;
-    max-width: 700px;
-    max-height: 85vh;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.2);
-    animation: slideUp 0.3s ease;
+  background: #fff;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 700px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.2);
 
-    @keyframes slideUp {
-        from {
-            opacity: 0;
-            transform: scale(0.95);
-        }
-        to {
-            opacity: 1;
-            transform: scale(1);
-        }
-    }
 }
 
 .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    padding: 20px 24px;
-    border-bottom: 1px solid #f0f0f0;
-    flex-shrink: 0;
-    background: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 20px 24px;
+  border-bottom: 1px solid #f0f0f0;
+  background: #fff;
 
-    .title {
-        font-size: 20px;
-        font-weight: 600;
-        color: #333;
-        margin: 0 0 4px 0;
-    }
+  .title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 4px 0;
+  }
 
-    .subtitle {
-        font-size: 14px;
-        color: #999;
-        margin: 0;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        max-width: 400px;
-    }
+  .subtitle {
+    font-size: 14px;
+    color: #999;
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 400px;
+  }
 
-    .closeBtn {
-        background: none;
-        border: none;
-        cursor: pointer;
-        padding: 8px;
-        border-radius: 6px;
-        color: #666;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.2s ease;
-        flex-shrink: 0;
-
-        &:hover {
-            background-color: #f5f5f5;
-        }
-
-        &:active {
-            background-color: #e8e8e8;
-        }
-    }
-}
-
-.timeline {
-    padding: 24px;
-    overflow-y: auto;
-    flex: 1;
-    position: relative;
-}
-
-.timelineItem {
-    position: relative;
-    padding-bottom: 32px;
-    display: flex;
-    gap: 16px;
-
-    &:last-child {
-        padding-bottom: 0;
-
-        .connector {
-            display: none;
-        }
-    }
-}
-
-.iconContainer {
-    position: relative;
-    flex-shrink: 0;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: white;
-    border: 3px solid #e8e8e8;
+  .closeBtn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 6px;
+    color: #666;
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1;
+    transition: all 0.2s ease;
 
-    .connector {
-        position: absolute;
-        left: 50%;
-        top: 100%;
-        transform: translateX(-50%);
-        width: 2px;
-        height: 24px;
-        background: #e8e8e8;
-        margin-top: 8px;
-
-        &.connectorActive {
-            background: #52c41a;
-        }
-    }
+    &:hover { background-color: #f5f5f5; }
+    &:active { background-color: #e8e8e8; }
+  }
 }
 
-.iconApproved {
-    color: #52c41a;
+.timeline {
+  padding: 24px;
+  overflow-y: auto;
+  flex: 1;
 }
 
-.iconRejected {
-    color: #ff4d4f;
+.timelineItem {
+  display: flex;
+  gap: 16px;
+  position: relative;
+  padding-bottom: 32px;
+
+  &:last-child {
+    padding-bottom: 0;
+
+    .connector { display: none; }
+  }
 }
 
-.iconPending {
-    color: #fa8c16;
+.iconContainer {
+  position: relative;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid #e8e8e8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .connector {
+    position: absolute;
+    left: 50%;
+    top: 100%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 24px;
+    background: #e8e8e8;
+    margin-top: 8px;
+
+    &.connectorActive { background: #52c41a; }
+  }
 }
 
-.iconNotReached {
-    color: #d9d9d9;
-}
+.iconApproved { color: #52c41a; }
+.iconRejected { color: #ff4d4f; }
+.iconPending { color: #fa8c16; }
+.iconNotReached { color: #d9d9d9; }
 
-.content {
-    flex: 1;
-    min-width: 0;
-}
+.content { flex: 1; min-width: 0; }
 
 .levelHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
-    gap: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  gap: 12px;
 
-    .levelLabel {
-        font-size: 16px;
-        font-weight: 600;
-        color: #333;
-    }
+  .levelLabel {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+  }
 }
 
 .approverInfo {
-    margin-bottom: 8px;
+  margin-bottom: 8px;
 
-    .approverName {
-        font-size: 14px;
-        color: #666;
-        margin: 0 0 4px 0;
-        font-weight: 500;
-    }
+  .approverName {
+    font-size: 14px;
+    color: #444;
+    margin: 0 0 4px 0;
+    font-weight: 500;
+  }
 
-    .approverRole {
-        font-size: 13px;
-        color: #999;
-        margin: 0;
-    }
+  .approverRole {
+    font-size: 13px;
+    color: #777;
+    margin: 0;
+  }
 }
 
 .timestamp {
-    font-size: 12px;
-    color: #999;
-    margin: 0;
+  font-size: 12px;
+  color: #999;
+  margin: 0;
 }
 
 .awaitingText {
-    font-size: 12px;
-    color: #fa8c16;
-    margin: 0;
-    font-style: italic;
+  font-size: 12px;
+  color: #fa8c16;
+  margin: 0;
+  font-style: italic;
 }
 
-// Status Badges
+// Status badges
 .badgeApproved,
 .badgePending,
 .badgeRejected {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 12px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 500;
-    flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
 }
 
 .badgeApproved {
-    background: #f6ffed;
-    color: #52c41a;
-    border: 1px solid #b7eb8f;
+  background: #f6ffed;
+  color: #52c41a;
+  border: 1px solid #b7eb8f;
 }
 
 .badgePending {
-    background: #fff7e6;
-    color: #fa8c16;
-    border: 1px solid #ffd591;
+  background: #fff7e6;
+  color: #fa8c16;
+  border: 1px solid #ffd591;
 }
 
 .badgeRejected {
-    background: #fff1f0;
-    color: #ff4d4f;
-    border: 1px solid #ffa39e;
+  background: #fff1f0;
+  color: #ff4d4f;
+  border: 1px solid #ffa39e;
 }
 
-// Mobile responsive
-@media (max-width: 768px) {
-    .overlay {
-        padding: 10px;
-    }
-
-    .modal {
-        width: 95%;
-        max-height: 90vh;
-    }
-
-    .header {
-        padding: 16px 20px;
-
-        .title {
-            font-size: 18px;
-        }
-
-        .subtitle {
-            font-size: 13px;
-            max-width: 250px;
-        }
-    }
-
-    .timeline {
-        padding: 20px;
-    }
-
-    .timelineItem {
-        gap: 12px;
-        padding-bottom: 24px;
-    }
-
-    .iconContainer {
-        width: 32px;
-        height: 32px;
-
-        svg {
-            width: 18px;
-            height: 18px;
-        }
-
-        .connector {
-            height: 20px;
-        }
-    }
-
-    .levelHeader {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
-
-        .levelLabel {
-            font-size: 15px;
-        }
-    }
+.loading {
+  font-size: 14px;
+  color: #333;
+  text-align: center;
+  padding: 20px;
 }
 
-@media (max-width: 480px) {
-    .modal {
-        width: 100%;
-        max-height: 95vh;
-        border-radius: 8px;
-    }
-
-    .header {
-        padding: 14px 16px;
-
-        .subtitle {
-            max-width: 200px;
-        }
-    }
-
-    .timeline {
-        padding: 16px;
-    }
-}

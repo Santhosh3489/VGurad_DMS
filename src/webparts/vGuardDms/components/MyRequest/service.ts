@@ -36,8 +36,10 @@ export const getApproversByLevel = async (level: 'L1_Approver' | 'L2_Approver' |
         const approvers = await sp.web.lists
             .getByTitle('User_Configuration')
             .items
-            .filter(`ApprovalLevel eq '${level}' and ApproverAccess eq 'yes'`)
+            .filter(`ApprovelLevel eq '${level}' and ApproverAccess eq 1`)
             .select('UserName', 'UserEmailId')();
+
+            console.log("Approvers",approvers);
 
         return approvers;
     } catch (error) {
@@ -52,6 +54,7 @@ const createApprovalTrackingRecords = async (requestId: string, params: ICreateR
     try {
 
         const l1Approvers = await getApproversByLevel('L1_Approver');
+        console.log("L1 Approvers:", l1Approvers);
         const l2Approvers = await getApproversByLevel('L2_Approver');
         const l3Approvers = await getApproversByLevel('L3_Approver');
 
@@ -67,10 +70,14 @@ const createApprovalTrackingRecords = async (requestId: string, params: ICreateR
                 Level_Status: 'Pending',
                 Requester_Name: params.requesterName,
                 Requester_MailId: params.requesterEmail,
+                Approver_Name: null,
+                Approver_MailId: null,
+                Approved_Date: null,
+                Comments: ''
             })
         }
 
-
+         
         if (l2Approvers.length > 0) {
             await sp.web.lists.getByTitle('Req_Approval_Lvl_Details').items.add({
                 RequestId: requestId,
@@ -81,6 +88,10 @@ const createApprovalTrackingRecords = async (requestId: string, params: ICreateR
                 Level_Status: 'Pending',
                 Requester_Name: params.requesterName,
                 Requester_MailId: params.requesterEmail,
+                Approver_Name: null,
+                Approver_MailId: null,
+                Approved_Date: null,
+                Comments: ''
             })
         }
 
@@ -94,6 +105,10 @@ const createApprovalTrackingRecords = async (requestId: string, params: ICreateR
                 Level_Status: 'Pending',
                 Requester_Name: params.requesterName,
                 Requester_MailId: params.requesterEmail,
+                Approver_Name: null,
+                Approver_MailId: null,
+                Approved_Date: null,
+                Comments: ''
             })
         }
 
@@ -141,7 +156,10 @@ export const createDMSRequest = async (params: ICreateRequestParams): Promise<st
             Requester_MailId: params.requesterEmail
         });
 
+        console.log("Entry in dms");
+
         await createApprovalTrackingRecords(requestId, params);
+       
 
         return requestId;
     } catch (error) {
@@ -247,3 +265,22 @@ export const getPendingApprovalsForUser = async (userEmail: string): Promise<any
         throw error;
     }
 }
+
+export const getApprovalLevelsByRequestId = async (requestId: string) => {
+  const sp = getSP();
+
+  return await sp.web.lists
+    .getByTitle('Req_Approval_Lvl_Details')
+    .items 
+    .filter(`RequestId eq '${requestId}'`)
+    .select(
+        'Id',
+      'RequestId',
+      'Req_Level',
+      'Level_Status',
+      'Approver_Name',
+      'Assigned_UserName',
+      'Assigned_MailId',
+      'Approved_Date'
+    )();
+};

@@ -13,13 +13,13 @@ export interface IRequestItem {
 
 
 export interface IApprovalLevel {
-    level: string;
-    label: string;
-    approverName: string;
-    approverRole: string;
-    status: 'approved' | 'pending' | 'not-reached';
-    timestamp?: string;
-    statusLabel: string;
+    Id: string;
+    Req_Level: string;  
+    Level_Status: 'Approved' | 'Pending' | 'notreached' | 'Rejected';
+    Approver_Name?: string;
+    Assigned_UserName?: string;
+    Assigned_MailId?: string;
+    Approved_Date?: string;
 }
 
 export interface ICreateRequestParams {
