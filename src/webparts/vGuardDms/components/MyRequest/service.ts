@@ -274,6 +274,7 @@ export const getApprovalLevelsByRequestId = async (requestId: string) => {
     .items 
     .filter(`RequestId eq '${requestId}'`)
     .select(
+        'Title',
         'Id',
       'RequestId',
       'Req_Level',

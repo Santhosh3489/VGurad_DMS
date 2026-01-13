@@ -1,4 +1,10 @@
-// Menu Dropdown Styles (for RequestCardMenu)
+
+.menuWrapper {
+  position: relative;
+  flex-shrink: 0;
+  z-index: 1; 
+}
+
 .menu {
     position: absolute;
     top: 100%;
