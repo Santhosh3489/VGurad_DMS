@@ -7,10 +7,11 @@ import { DateFormatter } from '../utils/DateFormatter';
 
 interface IRequestCardProps {
     request: IRequestItem;
+    onTrackProgressClick: () => void;
 }
 
 
-const RequestCard: React.FC<IRequestCardProps> = ({ request }) => {
+const RequestCard: React.FC<IRequestCardProps> = ({ request, onTrackProgressClick }) => {
 
     const [showMenu, setShowMenu] = React.useState(false);
     const menuRef = React.useRef<HTMLDivElement>(null); 
@@ -91,6 +92,7 @@ const RequestCard: React.FC<IRequestCardProps> = ({ request }) => {
                         <RequestCardMenu
                             request={request}
                             onClose={() => setShowMenu(false)}
+                            onTrackProgressClick={onTrackProgressClick}
                         />
                      )}
                 </div>
@@ -105,10 +107,13 @@ const RequestCard: React.FC<IRequestCardProps> = ({ request }) => {
             </span>  
         </div>
 
-        <div className={`${styles.statusBadge} ${statusInfo.className}`}>
-           {statusInfo.icon} 
-           <span>{statusInfo.label}</span>
-        </div>
+        <button
+             className={`${styles.statusBadge} ${statusInfo.className}`}
+             onClick={onTrackProgressClick}
+        >
+            {statusInfo.icon}
+          <span>{statusInfo.label}</span>
+        </button>
         </div>
 
         </div>
