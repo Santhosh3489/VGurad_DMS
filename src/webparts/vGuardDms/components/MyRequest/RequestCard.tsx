@@ -105,6 +105,7 @@ const RequestCard: React.FC<IRequestCardProps> = ({ request, onTrackProgressClic
              <span className={styles.dateValue}>
                 {DateFormatter.formatDate(request.Created)}
             </span>  
+
         </div>
 
         <button

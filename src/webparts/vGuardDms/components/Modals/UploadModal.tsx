@@ -11,6 +11,7 @@ import {
     PrimaryButton, Spinner, SpinnerSize,
     MessageBar, MessageBarType
 } from '@fluentui/react';
+import moment from 'moment';
 
 const UploadModal: React.FC<IUploadModalProps> = ({
     isOpen,
@@ -23,7 +24,13 @@ const UploadModal: React.FC<IUploadModalProps> = ({
     const [uploading, setUploading] = React.useState(false);
     const [uploadStatus, setUploadStatus] = React.useState<'idle' | 'success' | 'error'>('idle');
     const [error, setError] = React.useState('');
+    const [renewalDate, setRenewalDate] = React.useState<string>('');
+    const [department, setDepartment] = React.useState<string>('');
+
     const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+    const departments = ['HR', 'IT', 'Admin'];
+
 
     const sp: SPFI = getSP();
 
@@ -116,11 +123,15 @@ const UploadModal: React.FC<IUploadModalProps> = ({
             )
 
             const fileUrl = uploadResult.ServerRelativeUrl;
+            const formattedRenewalDate = moment(renewalDate, 'YYYY-MM-DD').toDate();
+
 
             const requestId = await createDMSRequest({
                 folderURL: fileUrl,
                 requesterName: userName,
-                requesterEmail: userEmail
+                requesterEmail: userEmail,
+                renewalDate: formattedRenewalDate,
+                department: department
             });
 
             console.log(`DMS request ${requestId} created successfully`);
@@ -270,6 +281,34 @@ const UploadModal: React.FC<IUploadModalProps> = ({
                         )}
                     </div>
                 )}
+
+                <div className={styles.renewalDateSection}>
+                    <label className={styles.dateLabel}>Renewal Date</label>
+                     <input
+                        type="date"
+                        className={styles.dateInput}
+                        value={renewalDate}
+                        onChange={(e) => setRenewalDate(e.target.value)}
+                        disabled={uploading}
+                     />
+
+                     <label className={styles.dateLabel} style={{marginLeft: '20px'}}>Department</label>
+                     <select
+                       className={styles.departmentDropdown}
+                       value={department}
+                       onChange={(e) => setDepartment(e.target.value)}
+                       disabled={uploading}
+                       style={{
+                          color: department === "" ? "#333" : "#000",
+                          fontWeight: "normal"
+                        }}
+                     >
+                          <option value=""  disabled hidden>Select Department</option>
+                          {departments.map((dept) => (
+                            <option key={dept} value={dept}>{dept}</option>
+                          ))}
+                     </select>
+                </div>
 
                 {uploadStatus === 'success' && (
                     <MessageBar

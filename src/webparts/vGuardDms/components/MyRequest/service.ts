@@ -50,7 +50,6 @@ const createApprovalTrackingRecords = async (requestId: string, params: ICreateR
     const sp: SPFI = getSP();
     try {
         const l1Approvers = await getApproversByLevel('L1_Approver');
-        console.log("L1 Approvers:", l1Approvers);
         const l2Approvers = await getApproversByLevel('L2_Approver');
         const l3Approvers = await getApproversByLevel('L3_Approver');
         const currentUser = params.requesterName;
@@ -79,7 +78,7 @@ const createApprovalTrackingRecords = async (requestId: string, params: ICreateR
                 FileURL: params.folderURL,
                 Assigned_UserName: l2Approvers[0].UserName,
                 Assigned_MailId: l2Approvers[0].UserEmailId,
-                Level_Status: 'Pending',
+                Level_Status: 'Not-Started',
                 Requester_Name: params.requesterName,
                 Requester_MailId: params.requesterEmail,
                 Approver_Name: null,
@@ -96,7 +95,7 @@ const createApprovalTrackingRecords = async (requestId: string, params: ICreateR
                 FileURL: params.folderURL,
                 Assigned_UserName: l3Approvers[0].UserName,
                 Assigned_MailId: l3Approvers[0].UserEmailId,
-                Level_Status: 'Pending',
+                Level_Status: 'Not-Started',
                 Requester_Name: params.requesterName,
                 Requester_MailId: params.requesterEmail,
                 Approver_Name: null,
@@ -110,6 +109,60 @@ const createApprovalTrackingRecords = async (requestId: string, params: ICreateR
         console.log(`Created approval tracking records for ${requestId}`);
         throw error;
     }
+}
+
+
+const updateApprovalStatus = async ( 
+    requestId: string,
+    level: 'L1' | 'L2' | 'L3',
+    action: 'Approved' | 'Rejected',
+    approverName: string,
+    approverEmail: string
+): Promise<void> => {
+
+    const sp: SPFI = getSP();
+    const list = sp.web.lists.getByTitle('Req_Approval_Lvl_Details');
+
+    const currentItems = await list.items
+                         .filter(`RequestId eq '${requestId}' and Req_Level eq '${level} Approval'`)();
+      if(currentItems.length === 0) return;
+      
+      const currentItemId = currentItems[0].Id;
+
+      await list.items.getById(currentItemId).update({
+         Level_Status: action === 'Approved' ? 'Approved' : 'Rejected',
+         Approver_Name: approverName,
+         Approver_MailId: approverEmail,
+         Approved_Date: new Date().toISOString()
+      });
+
+      if(level === 'L1'){
+         if(action === 'Approved'){
+             const l2Items = await list.items.filter(`RequestId eq '${requestId}' and Req_Level eq 'L2 Approval'`)();
+            if(l2Items.length>0){
+                await list.items.getById(l2Items[0].Id).update({
+                    Level_Status: 'Pending'
+                })
+            }
+         }
+      }
+
+      if(level === 'L2'){
+         if(action === 'Approved'){
+             const l3Items = await list.items.filter(`RequestId eq '${requestId}' and Req_Level eq 'L3 Approval'`)();
+            if(l3Items.length>0){
+                await list.items.getById(l3Items[0].Id).update({
+                    Level_Status: 'Pending'
+                })
+            }
+         }
+      }
+
+      if(level === 'L3'){
+        await list.items.getById(currentItemId).update({
+            Level_Status: action === 'Approved' ? 'Completed' : 'Rejected'
+        })
+      }
 }
 
 const updateMainRequestStatus = async (requestId: string, status: string, levelStatus: string): Promise<void> => {
@@ -141,7 +194,9 @@ export const createDMSRequest = async (params: ICreateRequestParams): Promise<st
             Status: 'InProgress',
             Level_Status: 'L1 Pending',
             Requester_Name: params.requesterName,
-            Requester_MailId: params.requesterEmail
+            Requester_MailId: params.requesterEmail,
+            Renewal_date: params.renewalDate,
+            Department: params.department
         });
 
         console.log("Entry in dms");

@@ -26,6 +26,8 @@ export interface ICreateRequestParams {
     folderURL: string;
     requesterName: string;
     requesterEmail: string;
+    renewalDate: Date;
+    department: string;
 }
 
 export interface IApprovalAction {
