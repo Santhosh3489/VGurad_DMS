@@ -7,7 +7,8 @@ import FolderCard from './FolderCard';
 import DocumentCard from './DocumentCard';
 import Breadcrumbs, { IBreadcrumbItem } from '../Helper/Breadcrumbs';
 import Header from '../Helper/Header';
-import { List, Grid2X2 } from 'lucide-react';
+import { List, Grid2X2, Search, X } from 'lucide-react';
+import { DocsLibraryService } from './DocsService';
 
 const DocsLibrary: React.FC<IDocsLibraryProps> = ({
     currentView,
@@ -39,22 +40,37 @@ const DocsLibrary: React.FC<IDocsLibraryProps> = ({
     const [historyIndex, setHistoryIndex] = React.useState<number>(0);
     const isNavigatingRef = React.useRef<boolean>(false);
 
-  
+    const [isSearching, setIsSearching] = React.useState<boolean>(false);
+    const [searchResults, setSearchResults] = React.useState<{
+        file: IFileInfo;
+        folderPath: string;
+        relativePath: string;
+    }[]>([]);
+
+    // Add search loading state
+    const [searchLoading, setSearchLoading] = React.useState<boolean>(false);
+    const searchTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+
+    // Create service instance
+    const docsLibraryService = React.useMemo(() =>
+        new DocsLibraryService(_sp), [_sp]
+    );
+
     const handleAddNew = React.useCallback(() => {
-        if(onAddNew){
+        if (onAddNew) {
             onAddNew(); // call the parent handler
         }
     }, [onAddNew]);
 
     const buildBreadcrumbs = React.useCallback((path: string): IBreadcrumbItem[] => {
         const libraryRoot = `${siteRoot}/${LibraryConstants.DOCUMENT_LIBRARY.DMS_Library}`;
-        
+
         if (path === libraryRoot) {
             return [];
         }
 
         const relativePath = path.replace(libraryRoot, '').replace(/^\/+|\/+$/g, '');
-        
+
         if (!relativePath) {
             return [];
         }
@@ -74,61 +90,220 @@ const DocsLibrary: React.FC<IDocsLibraryProps> = ({
         return breadcrumbItems;
     }, [siteRoot]);
 
-   
-    const loadFolder = React.useCallback(async (folderPath: string, forceRefresh: boolean = false): Promise<void> => {
+    const loadFolder = React.useCallback(async (folderPath: string, forceRefresh: boolean = false, searchTerm?: string): Promise<void> => {
         try {
+            // Clear search results when not searching
+            if (!searchTerm) {
+                setSearchResults([]);
+                setIsSearching(false);
+            }
+
             const cachedData = folderCacheRef.current.get(folderPath);
             const CACHE_DURATION = 5 * 60 * 1000;
             const now = Date.now();
 
-            if (!forceRefresh && cachedData && (now - cachedData.timestamp) < CACHE_DURATION) {
+            // IMPORTANT: Only use cache for the SAME folder path
+            // Don't use cache when forceRefresh is true or when searching
+            if (!searchTerm && !forceRefresh && cachedData && (now - cachedData.timestamp) < CACHE_DURATION && cachedData.path === folderPath) {
                 setCurrentPath(folderPath);
                 setFolders(cachedData.folders);
                 setFiles(cachedData.files);
                 setBreadcrumbs(cachedData.breadcrumbs);
+                setSearchResults([]);
+                setError('');
 
+                // Call onFolderChange AFTER state is set
                 const folderName = folderPath.split('/').pop() || LibraryConstants.DOCUMENT_LIBRARY.DMS_Library;
                 onFolderChange(folderName, folderPath);
 
-                setError('');
+                setLoading(false);
                 return;
             }
 
             setLoading(true);
+            if (searchTerm) {
+                setSearchLoading(true);
+            }
             setError('');
 
-            const folder = _sp.web.getFolderByServerRelativePath(folderPath);
-            const [folderResult, fileResult] = await Promise.all([
-                folder.folders(),
-                folder.files()
-            ]);
+            let result: { folders: IFolderInfo[], files: IFileInfo[], searchResults?: any[] };
+
+            if (searchTerm && searchTerm.trim()) {
+                // Perform recursive search
+                setIsSearching(true);
+                result = await docsLibraryService.searchRecursive(folderPath, searchTerm);
+                setSearchResults(result.searchResults || []);
+            } else {
+                // Normal folder load
+                setIsSearching(false);
+                result = await docsLibraryService.getFolderContents(folderPath);
+                setSearchResults([]);
+            }
 
             const newBreadcrumbs = buildBreadcrumbs(folderPath);
 
-            folderCacheRef.current.set(folderPath, {
-                folders: folderResult || [],
-                files: fileResult || [],
-                breadcrumbs: newBreadcrumbs,
-                timestamp: now
-            });
+            // Cache only non-search results
+            if (!searchTerm) {
+                folderCacheRef.current.set(folderPath, {
+                    path: folderPath, // Store the path in cache
+                    folders: result.folders || [],
+                    files: result.files || [],
+                    breadcrumbs: newBreadcrumbs,
+                    timestamp: now
+                });
+            }
 
+            // Update all state together
             setCurrentPath(folderPath);
-            setFolders(folderResult || []);
-            setFiles(fileResult || []);
+            setFolders(result.folders || []);
+            setFiles(result.files || []);
             setBreadcrumbs(newBreadcrumbs);
+            setError('');
 
             const folderName = folderPath.split('/').pop() || LibraryConstants.DOCUMENT_LIBRARY.DMS_Library;
             onFolderChange(folderName, folderPath);
 
         } catch (err: any) {
-            console.log("Error in loading folder: ", err);
-            setError(err.message);
+            console.error("Error in loading folder: ", err);
+            setError(err.message || 'Failed to load folder');
+            setIsSearching(false);
+            setSearchResults([]);
         } finally {
             setLoading(false);
+            setSearchLoading(false);
         }
-    }, [buildBreadcrumbs, onFolderChange, _sp]); // ✅ Added dependencies
+    }, [buildBreadcrumbs, onFolderChange, docsLibraryService]);
 
-    
+    // Clear search function
+    const handleClearSearch = React.useCallback(() => {
+        if (externalOnSearch) {
+            externalOnSearch('');
+        } else {
+            setInternalSearchTerm('');
+        }
+
+        // Clear search and load current folder
+        void loadFolder(currentPath, false);
+
+        // Clear any pending search timeout
+        if (searchTimeoutRef.current) {
+            clearTimeout(searchTimeoutRef.current);
+            searchTimeoutRef.current = null;
+        }
+    }, [externalOnSearch, loadFolder, currentPath]);
+
+    // Update the search handler to trigger recursive search with debouncing
+    const handleSearchChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+
+        if (externalOnSearch) {
+            externalOnSearch(value);
+        } else {
+            setInternalSearchTerm(value);
+        }
+
+        // Clear any existing timeout
+        if (searchTimeoutRef.current) {
+            clearTimeout(searchTimeoutRef.current);
+        }
+
+        // Set loading state immediately when user starts typing
+        if (value.trim()) {
+            setSearchLoading(true);
+        } else {
+            setSearchLoading(false);
+        }
+
+        // Debounce search to avoid too many API calls
+        searchTimeoutRef.current = setTimeout(() => {
+            // Trigger search when typing
+            if (value.trim()) {
+                void loadFolder(currentPath, false, value);
+            } else {
+                // Clear search and load current folder
+                void loadFolder(currentPath, false);
+            }
+        }, 300);
+    }, [externalOnSearch, loadFolder, currentPath]);
+
+    // Clean up timeout on unmount
+    React.useEffect(() => {
+        return () => {
+            if (searchTimeoutRef.current) {
+                clearTimeout(searchTimeoutRef.current);
+            }
+        };
+    }, []);
+
+    React.useEffect(() => {
+        loadFolder(initialPath).catch((err) => {
+            console.error('Failed to load initial folder:', err);
+            setError('Failed to load initial folder');
+        });
+    }, [loadFolder, initialPath]);
+    // Initial load - only on mount
+    React.useEffect(() => {
+        // Create a wrapper function that doesn't depend on loadFolder
+        const loadInitialData = async () => {
+            try {
+                setLoading(true);
+                setError('');
+
+                const result = await docsLibraryService.getFolderContents(initialPath);
+                const newBreadcrumbs = buildBreadcrumbs(initialPath);
+
+                setCurrentPath(initialPath);
+                setFolders(result.folders || []);
+                setFiles(result.files || []);
+                setBreadcrumbs(newBreadcrumbs);
+
+                // Call onFolderChange for initial load too
+                const folderName = initialPath.split('/').pop() || LibraryConstants.DOCUMENT_LIBRARY.DMS_Library;
+                onFolderChange(folderName, initialPath);
+
+            } catch (err: any) {
+                console.error('Failed to load initial folder:', err);
+                setError('Failed to load initial folder');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadInitialData();
+    }, []);
+
+    React.useEffect(() => {
+        console.log('Current path updated:', currentPath);
+    }, [currentPath]);
+
+    // Update filtered files to use search results when searching
+    const filteredFiles = React.useMemo(() => {
+        if (!actualSearchTerm) return files;
+
+        // When searching recursively, we already have filtered files
+        if (isSearching) {
+            return files;
+        }
+
+        // Client-side filtering for non-recursive search
+        return files.filter(f =>
+            f.Name.toLowerCase().includes(actualSearchTerm.toLowerCase())
+        );
+    }, [files, actualSearchTerm, isSearching]);
+
+    // Update filtered folders similarly
+    const filteredFolders = React.useMemo(() => {
+        if (!actualSearchTerm) return folders;
+
+        if (isSearching) {
+            return folders;
+        }
+
+        return folders.filter(f =>
+            f.Name.toLowerCase().includes(actualSearchTerm.toLowerCase())
+        );
+    }, [folders, actualSearchTerm, isSearching]);
+
     React.useEffect(() => {
         if (isNavigatingRef.current) {
             isNavigatingRef.current = false;
@@ -141,14 +316,14 @@ const DocsLibrary: React.FC<IDocsLibraryProps> = ({
             setHistory(newHistory);
             setHistoryIndex(newHistory.length - 1);
         }
-    }, [currentPath, history, historyIndex]); 
+    }, [currentPath, history, historyIndex]);
 
     React.useImperativeHandle(ref, () => ({
         loadFolder: (path: string) => loadFolder(path, true),
         loadRootFolder: () => loadFolder(initialPath, true)
-    }), [loadFolder, initialPath]); 
+    }), [loadFolder, initialPath]);
 
-   
+
     const handleBreadcrumbNavigate = React.useCallback((path: string) => {
         isNavigatingRef.current = true;
 
@@ -159,38 +334,22 @@ const DocsLibrary: React.FC<IDocsLibraryProps> = ({
         }
     }, [loadFolder, siteRoot]);
 
-   
     const handleFolderClick = React.useCallback((folder: IFolderInfo) => {
+        console.log('Navigating to folder:', folder.ServerRelativeUrl);
+        console.log('Current path before navigation:', currentPath);
         void loadFolder(folder.ServerRelativeUrl);
-    }, [loadFolder]);
+    }, [loadFolder, currentPath]);
 
     const handleFileClick = React.useCallback((file: IFileInfo) => {
-        window.open(file.ServerRelativeUrl, '_blank');
-    }, []);
+        const officeExtensions = ['.docx', '.doc', '.xlsx', '.xls', '.pptx', '.ppt'];
+        const fileExtension = file.Name.substring(file.Name.lastIndexOf('.')).toLowerCase();
 
-    const filteredFolders = React.useMemo(() => {
-        if (!actualSearchTerm) return folders;
-        return folders.filter(f =>
-            f.Name.toLowerCase().includes(actualSearchTerm.toLowerCase())
-        );
-    }, [folders, actualSearchTerm]);
-
-    const filteredFiles = React.useMemo(() => {
-        if (!actualSearchTerm) return files;
-        return files.filter(f =>
-            f.Name.toLowerCase().includes(actualSearchTerm.toLowerCase())
-        );
-    }, [files, actualSearchTerm]);
-
-    const handleSearchChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        
-        if (externalOnSearch) {
-            externalOnSearch(value);
+        if (officeExtensions.includes(fileExtension)) {
+            window.open(`${file.ServerRelativeUrl}?web=1`, '_blank');
         } else {
-            setInternalSearchTerm(value);
+            window.open(file.ServerRelativeUrl, '_blank');
         }
-    }, [externalOnSearch]);
+    }, []);
 
     const handleViewToggle = React.useCallback((view: 'list' | 'grid') => {
         if (externalOnViewChange) {
@@ -200,7 +359,7 @@ const DocsLibrary: React.FC<IDocsLibraryProps> = ({
         }
     }, [externalOnViewChange]);
 
-   
+
     React.useEffect(() => {
         loadFolder(initialPath).catch((err) => {
             console.error('Failed to load initial folder:', err);
@@ -212,8 +371,8 @@ const DocsLibrary: React.FC<IDocsLibraryProps> = ({
         return (
             <div className={styles.errorContainer}>
                 <p>Error: {error}</p>
-                <button 
-                    onClick={() => void loadFolder(currentPath, true)} 
+                <button
+                    onClick={() => void loadFolder(currentPath, true)}
                     className={styles.retryBtn}
                 >
                     Retry
@@ -224,12 +383,17 @@ const DocsLibrary: React.FC<IDocsLibraryProps> = ({
 
     return (
         <div className={styles.container}>
-            <Header
-                title="Documents"
-                showAddButton={true}
-                onAddNew={handleAddNew}
-                showSearch={false}
-            />
+            <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Header
+                    title={"Documents"}
+                    showAddButton={true}
+                    onAddNew={handleAddNew}
+                    showSearch={false}
+                />
+                <div >
+                    <img src={require('../../assets/VguardLogo.png')} />
+                </div>
+            </div>
 
             <div className={styles.navigationBar}>
                 <div className={styles.breadcrumbSection}>
@@ -240,16 +404,33 @@ const DocsLibrary: React.FC<IDocsLibraryProps> = ({
                         showHome={true}
                     />
                 </div>
-                  
+
                 <div className={styles.controlsSection}>
-                    <div className={styles.searchBox}>  
-                        <input
-                            type="text"
-                            placeholder="Search files..."
-                            value={actualSearchTerm}
-                            onChange={handleSearchChange}
-                            className={styles.searchInput}
-                        />
+                    <div className={styles.searchBox}>
+                        <div className={styles.searchWrapper}>
+                            <Search className={styles.searchIcon} size={18} />
+                            <input
+                                type="text"
+                                placeholder="Search files..."
+                                value={actualSearchTerm}
+                                onChange={handleSearchChange}
+                                className={styles.searchInput}
+                            />
+                            {searchLoading && (
+                                <div className={styles.searchLoading}>
+                                    <div className={styles.loadingSpinner}></div>
+                                </div>
+                            )}
+                            {actualSearchTerm && !searchLoading && (
+                                <button
+                                    onClick={handleClearSearch}
+                                    className={styles.clearSearchBtn}
+                                    title="Clear search"
+                                >
+                                    <X size={18} />
+                                </button>
+                            )}
+                        </div>
                     </div>
 
                     <div className={styles.viewToggle}>
@@ -268,15 +449,21 @@ const DocsLibrary: React.FC<IDocsLibraryProps> = ({
                             <Grid2X2 size={20} />
                         </button>
                     </div>
-                </div>  
+                </div>
             </div>
 
             <div className={styles.contentWrapper}>
                 {loading ? (
                     <div className={styles.loadingContainer}>
-                        <p>Loading...</p>
+                        <div className={styles.spinner}></div>
+                        <p>Loading folder contents...</p>
                     </div>
-                ) : filteredFolders.length === 0 && filteredFiles.length === 0 && actualSearchTerm ? (
+                ) : searchLoading ? (
+                    <div className={styles.loadingContainer}>
+                        <div className={styles.spinner}></div>
+                        <p>Searching for "{actualSearchTerm}"...</p>
+                    </div>
+                ) : isSearching && filteredFolders.length === 0 && filteredFiles.length === 0 ? (
                     <div className={styles.emptyState}>
                         <p>No documents found matching "{actualSearchTerm}"</p>
                     </div>
@@ -297,14 +484,16 @@ const DocsLibrary: React.FC<IDocsLibraryProps> = ({
                                     />
                                 ))}
 
-                                {filteredFiles.map((file) => (
-                                    <DocumentCard
-                                        key={file.ServerRelativeUrl}
-                                        name={file.Name}
-                                        date={file.TimeLastModified}
-                                        onClick={() => handleFileClick(file)}
-                                    />
-                                ))}
+                                {filteredFiles.map((file) => {
+                                    return (
+                                        <DocumentCard
+                                            key={file.ServerRelativeUrl}
+                                            name={file.Name}
+                                            date={file.TimeLastModified}
+                                            onClick={() => handleFileClick(file)}
+                                        />
+                                    );
+                                })}
                             </div>
                         ) : (
                             <div className={styles.listView}>

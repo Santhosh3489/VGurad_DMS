@@ -6,27 +6,26 @@ export class LibraryConstants {
         DMS_REQUEST: 'DMS_Request',
         APPROVAL_DETAILS: 'Req_Approval_Lvl_Details',
         USER_CONFIG: 'User_Configuration',
-        
+
     };
 
     public static readonly DOCUMENT_LIBRARY = {
-        DMS_Library : 'DMS',
+        DMS_Library: 'DMS',
         TEMPLATES_Library: 'Form Templates'
     };
 
     public static readonly ITEMS_PER_PAGE = 25;
 }
 
-
 // Docs Library services ....
-export interface IFileInfo{
+export interface IFileInfo {
     Name: string;
     ServerRelativeUrl: string;
     TimeLastModified: string;
     Length: string;
 }
 
-export interface IFolderInfo{
+export interface IFolderInfo {
     Name: string;
     ServerRelativeUrl: string;
     TimeCreated: string;
@@ -34,12 +33,13 @@ export interface IFolderInfo{
 }
 
 export interface IDocsLibraryProps {
-    currentView: 'list' | 'grid';
+    currentView?: 'list' | 'grid';
     searchTerm?: string;
-    onFolderChange: (folderName: string, folderPath: string) => void;
-    onViewChange?: (view: 'list' | 'grid') => void; // Add this
-    onSearch?: (searchTerm: string) => void; // Optional: if you want parent control
+    onFolderChange: (folderName: string, folderUrl: string) => void;
+    onViewChange?: (view: 'list' | 'grid') => void;
+    onSearch?: (term: string) => void;
     onAddNew?: () => void;
+    onUploadSuccess?: () => void; // Add this if you want to refresh after upload
 }
 
 export interface IDocsLibraryRef {
@@ -53,6 +53,7 @@ export interface IFolderCache {
     files: IFileInfo[];
     breadcrumbs: IBreadcrumbItem[];
     timestamp: number;
+    path?: string;
 }
 
 // Document Card services ...

@@ -43,7 +43,7 @@ const TrackProgressModal: React.FC<ITrackProgressModalProps> = ({
     };
 
     if (isOpen && request?.RequestId) {
-      loadTimeline();
+     void loadTimeline();
     }
   }, [isOpen, request?.RequestId]);
 

@@ -7,9 +7,10 @@ const Home = () => {
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [currentView, setCurrentView] = React.useState<'grid' | 'list'>('grid');
   const [searchTerm, setSearchTerm] = React.useState<string>('');
+  const [currentFolderPath, setCurrentFolderPath] = React.useState<string>(''); // Add this state
 
   const handleOpenModal = () => {
-    setIsModalOpen(true); 
+    setIsModalOpen(true);
   };
 
   const handleCloseModal = () => {
@@ -24,12 +25,10 @@ const Home = () => {
     setSearchTerm(term);
   };
 
-  const handleFolderChange = (folderName: string, folderUrl: string) => {
-    // You can use this for other purposes if needed
+  const handleFolderChange = React.useCallback((folderName: string, folderUrl: string) => {
+    setCurrentFolderPath(folderUrl);
     console.log('Folder changed:', folderName, folderUrl);
-  };
-
-
+  }, []);
 
   return (
     <div style={{ width: '100%', height: '100%' }}>
@@ -39,12 +38,13 @@ const Home = () => {
         onFolderChange={handleFolderChange}
         onViewChange={handleViewChange}
         onSearch={handleSearch}
-        onAddNew = {handleOpenModal}
+        onAddNew={handleOpenModal}
       />
 
       <FileUpload
         isOpen={isModalOpen}
         onClose={handleCloseModal}
+        currentFolderPath={currentFolderPath}
       />
     </div>
   );

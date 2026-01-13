@@ -1,6 +1,7 @@
 export interface PopupProps {
     isOpen: boolean;
     onClose: () => void;
+    currentFolderPath?: string;  
 }
 
 export interface ITemplate {
@@ -17,6 +18,7 @@ export interface ITemplateModalProps {
     onClose: () => void;
 }
 
+// In ModalConfig.ts (or wherever your interfaces are defined)
 export interface IUploadModalProps {
     isOpen: boolean;
     onClose: () => void;
@@ -24,4 +26,8 @@ export interface IUploadModalProps {
     onUploadSuccess?: () => void;
 }
 
-
+export interface PopupProps {
+    isOpen: boolean;
+    onClose: () => void;
+    currentFolderPath?: string; 
+}

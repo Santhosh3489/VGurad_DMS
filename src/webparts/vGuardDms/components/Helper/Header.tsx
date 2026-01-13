@@ -1,18 +1,12 @@
 import * as React from 'react';
-import { Plus, List, Grid2X2 } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import styles from '../Styles/Header.module.scss'
-import { IHeaderProps } from './helperConfig'
-import Breadcrumbs from './Breadcrumbs';
+import { IHeaderProps } from './helperConfig';
 
 const Header: React.FC<IHeaderProps> = ({
     title,
     showAddButton = false,
     onAddNew,
-  // showSearch = false,
-  // onSearch,
-  //  showViewToggle = false,
-  //  currentView = 'list',
-   // onViewChange,
     activeTabForRequest,
     onTabChangeForRequest,
     pendingCount = 0,
@@ -20,18 +14,6 @@ const Header: React.FC<IHeaderProps> = ({
     activeTabForApprover,
     onTabChangeForApprover
 }) => {
-  //  const [searchTerm, setSearchTerm] = React.useState('');
-
-const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //  const value = e.target.value;
-  //  setSearchTerm(value);
-    
-   // ADD THIS: Call the onSearch callback if provided
-    // if (onSearch) {
-    //     onSearch(value);
-    // }
-};
-
     return (
         <header className={styles.header}>
             <div className={styles.headerLeft}>
@@ -40,31 +22,26 @@ const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 
                 {showAddButton && onAddNew && (
                     <button className={styles.addButton} onClick={onAddNew}>
-                        <Plus size={20} />
+                        <span style={{ padding: '4px', border: '2px solid #fff', borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}><Plus size={12} stroke='#fff' /></span>
                         <span>Add New</span>
                     </button>
-                )}    
+                )}
 
                 {activeTabForRequest && onTabChangeForRequest && (
                     <div className={styles.pillTabs}>
                         <button
                             className={`${styles.pillTab} ${activeTabForRequest === 'pending' ? styles.activePill : ''}`}
-                            onClick={() => onTabChangeForRequest('pending')}
-                        >
+                            onClick={() => onTabChangeForRequest('pending')}>
                             Pending
-                            
-                                <span className={styles.pillCount}>{pendingCount}</span>
-                            
+                            <span className={styles.pillCount}>{pendingCount}</span>
                         </button>
                         <button
                             className={`${styles.pillTab} ${activeTabForRequest === 'completed' ? styles.activePill : ''}`}
                             onClick={() => onTabChangeForRequest('completed')}
                         >
                             Completed
-                            
-                                <span className={styles.pillCount}>{completedCount}</span>
-                           
-                        </button>
+                            <span className={styles.pillCount}>{completedCount}</span>
+                        </button> 
                     </div>
                 )}
 
@@ -82,39 +59,7 @@ const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
                         </button>
                     </div>
                 )}
-            </div> 
-
-             {/* <div className={styles.headerRight}>
-                {showSearch && (
-                    <div className={styles.searchBox}>
-                        
-                        <input
-                            type="text"
-                            placeholder="Search files..."
-                            value={searchTerm}
-                            onChange={handleSearchChange}
-                            className={styles.searchInput}
-                        />
-                    </div>
-                )}
-
-                {showViewToggle && onViewChange && (
-                    <div className={styles.viewToggle}>
-                        <button
-                            className={`${styles.viewBtn} ${currentView === 'list' ? styles.activeView : ''}`}
-                            onClick={() => onViewChange('list')}
-                            title="List view" >
-                            <List size={20} />
-                        </button>
-                        <button
-                            className={`${styles.viewBtn} ${currentView === 'grid' ? styles.activeView : ''}`}
-                            onClick={() => onViewChange('grid')}
-                            title="Grid view" >
-                            <Grid2X2 size={20} />
-                        </button>
-                    </div>
-                )}
-            </div>   */}
+            </div>
         </header>
     );
 };

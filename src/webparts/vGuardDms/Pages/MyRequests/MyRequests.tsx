@@ -88,24 +88,23 @@ const MyRequests: React.FC = () => {
 
   return (
     <div className={styles.container}>
-      <Header
-        title="My Requests"
-        activeTabForRequest={activeTab}
-        onTabChangeForRequest={handleTabChange}
-        pendingCount={pendingRequests.length}
-        completedCount={completedRequests.length}
-      />
-
-
-      <div className={styles.searchBar}>
-        <Search size={18} className={styles.searchIcon} />
-        <input
-          type='text'
-          placeholder='Search requests...'
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className={styles.searchInput}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+        <Header
+          title="My Requests"
+          activeTabForRequest={activeTab}
+          onTabChangeForRequest={handleTabChange}
+          pendingCount={pendingRequests.length}
+          completedCount={completedRequests.length}
         />
+        <div className={styles.searchBar}>
+          <Search size={18} className={styles.searchIcon} />
+          <input
+            type='text'
+            placeholder='Search requests...'
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className={styles.searchInput}
+          /></div>
       </div>
 
       <div className={styles.cardsContainer}>

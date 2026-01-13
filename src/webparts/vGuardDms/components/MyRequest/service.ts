@@ -4,7 +4,6 @@ import "@pnp/sp/items";
 import "@pnp/sp/lists";
 import { ICreateRequestParams, IApprovalAction } from './helperConfig';
 
-
 export const generateRequestId = async (): Promise<string> => {
     const sp: SPFI = getSP();
     try {
@@ -29,7 +28,6 @@ export const generateRequestId = async (): Promise<string> => {
     }
 }
 
-
 export const getApproversByLevel = async (level: 'L1_Approver' | 'L2_Approver' | 'L3_Approver'): Promise<any[]> => {
     const sp: SPFI = getSP();
     try {
@@ -39,7 +37,7 @@ export const getApproversByLevel = async (level: 'L1_Approver' | 'L2_Approver' |
             .filter(`ApprovelLevel eq '${level}' and ApproverAccess eq 1`)
             .select('UserName', 'UserEmailId')();
 
-            console.log("Approvers",approvers);
+        console.log("Approvers", approvers);
 
         return approvers;
     } catch (error) {
@@ -50,14 +48,11 @@ export const getApproversByLevel = async (level: 'L1_Approver' | 'L2_Approver' |
 
 const createApprovalTrackingRecords = async (requestId: string, params: ICreateRequestParams): Promise<void> => {
     const sp: SPFI = getSP();
-
     try {
-
         const l1Approvers = await getApproversByLevel('L1_Approver');
         console.log("L1 Approvers:", l1Approvers);
         const l2Approvers = await getApproversByLevel('L2_Approver');
         const l3Approvers = await getApproversByLevel('L3_Approver');
-
         const currentUser = params.requesterName;
 
         if (l1Approvers.length > 0) {
@@ -77,7 +72,6 @@ const createApprovalTrackingRecords = async (requestId: string, params: ICreateR
             })
         }
 
-         
         if (l2Approvers.length > 0) {
             await sp.web.lists.getByTitle('Req_Approval_Lvl_Details').items.add({
                 RequestId: requestId,
@@ -111,19 +105,15 @@ const createApprovalTrackingRecords = async (requestId: string, params: ICreateR
                 Comments: ''
             })
         }
-
         console.log(`Created approval tracking records for ${requestId}`);
-
     } catch (error) {
         console.log(`Created approval tracking records for ${requestId}`);
         throw error;
     }
-
 }
 
 const updateMainRequestStatus = async (requestId: string, status: string, levelStatus: string): Promise<void> => {
     const sp: SPFI = getSP();
-
     try {
         const requests = await sp.web.lists
             .getByTitle('DMS_Request')
@@ -143,10 +133,8 @@ const updateMainRequestStatus = async (requestId: string, status: string, levelS
 
 export const createDMSRequest = async (params: ICreateRequestParams): Promise<string> => {
     const sp: SPFI = getSP();
-
     try {
         const requestId = await generateRequestId();
-
         await sp.web.lists.getByTitle('DMS_Request').items.add({
             RequestId: requestId,
             FolderURL: params.folderURL,
@@ -157,10 +145,7 @@ export const createDMSRequest = async (params: ICreateRequestParams): Promise<st
         });
 
         console.log("Entry in dms");
-
         await createApprovalTrackingRecords(requestId, params);
-       
-
         return requestId;
     } catch (error) {
         console.log('Error creating DMS request:', error);
@@ -170,20 +155,15 @@ export const createDMSRequest = async (params: ICreateRequestParams): Promise<st
 
 export const processApprovalAction = async (params: IApprovalAction): Promise<void> => {
     const sp: SPFI = getSP();
-
     try {
-
         const { requestId, approvalLevel, action, approverName, approverEmail, comments } = params;
-
         const approvalRecords = await sp.web.lists
             .getByTitle('Req_Approval_Lvl_Details')
             .items
             .filter(`RequestId eq '${requestId}' and Req_Level eq '${approvalLevel} Approval'`)();
 
         if (approvalRecords.length > 0) {
-
             const recordId = approvalRecords[0].Id;
-
             await sp.web.lists.getByTitle('Req_Approval_Lvl_Details').items.getById(recordId).update({
                 Level_Status: action === 'Approve' ? 'Approved' : 'Rejected',
                 Approver_Name: approverName,
@@ -192,30 +172,24 @@ export const processApprovalAction = async (params: IApprovalAction): Promise<vo
                 Comments: comments || ''
             });
 
-
             if (action === 'Reject') {
                 await updateMainRequestStatus(requestId, 'Rejected', `${approvalLevel} Rejected`);
             } else if (action === 'Approve') {
                 const nextLevel = approvalLevel === 'L1' ? 'L2' : 'L3';
                 await updateMainRequestStatus(requestId, 'InProgress', `${nextLevel} Pending`);
             }
-
             if (approvalLevel === 'L3') {
                 await updateMainRequestStatus(requestId, 'Approved', 'Completed');
             }
-
         }
     } catch (error) {
-
         console.log('Error processing approval action:', error);
         throw error;
-
     }
 };
 
 export const getUserRequestsWithDetails = async (userEmail: string): Promise<any[]> => {
     const sp: SPFI = getSP();
-
     try {
         const requests = await sp.web.lists
             .getByTitle('DMS_Request')
@@ -236,12 +210,8 @@ export const getUserRequestsWithDetails = async (userEmail: string): Promise<any
                     ...request,
                     approvalLevels: approvalDetails
                 }
-            }
-            )
-        )
-
+            }))
         return requestsWithDetails;
-
     } catch (error) {
         console.log('Error fetching user requests:', error);
         throw error;
@@ -251,7 +221,6 @@ export const getUserRequestsWithDetails = async (userEmail: string): Promise<any
 
 export const getPendingApprovalsForUser = async (userEmail: string): Promise<any[]> => {
     const sp: SPFI = getSP();
-
     try {
         const pendingApprovals = await sp.web.lists
             .getByTitle('Req_Approval_Lvl_Details')
@@ -267,20 +236,19 @@ export const getPendingApprovalsForUser = async (userEmail: string): Promise<any
 }
 
 export const getApprovalLevelsByRequestId = async (requestId: string) => {
-  const sp = getSP();
-
-  return await sp.web.lists
-    .getByTitle('Req_Approval_Lvl_Details')
-    .items 
-    .filter(`RequestId eq '${requestId}'`)
-    .select(
-        'Id',
-      'RequestId',
-      'Req_Level',
-      'Level_Status',
-      'Approver_Name',
-      'Assigned_UserName',
-      'Assigned_MailId',
-      'Approved_Date'
-    )();
+    const sp = getSP();
+    return await sp.web.lists
+        .getByTitle('Req_Approval_Lvl_Details')
+        .items
+        .filter(`RequestId eq '${requestId}'`)
+        .select(
+            'Id',
+            'RequestId',
+            'Req_Level',
+            'Level_Status',
+            'Approver_Name',
+            'Assigned_UserName',
+            'Assigned_MailId',
+            'Approved_Date'
+        )();
 };

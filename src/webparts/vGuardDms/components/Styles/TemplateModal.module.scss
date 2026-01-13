@@ -67,7 +67,7 @@
 }
 
 .body {
-  padding: 32px;
+  padding: 10px;
   overflow-y: auto;
   flex: 1;
 }
@@ -88,7 +88,7 @@
   scrollbar-color: #ff9800 #f5f5f5;
 
   &::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
   }
 
   &::-webkit-scrollbar-track {
@@ -110,7 +110,7 @@
   background: #ffffff;
   border: 1px solid #e0e0e0;
   border-radius: 12px;
-  padding: 24px;
+  padding: 18px;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -126,14 +126,14 @@
 .templateIcon {
   width: 56px;
   height: 56px;
-  border-radius: 12px;
-  background: #fff3e0;
+  border-radius: 10px;
+  background: #fffefb;
   display: flex;
   align-items: center;
   justify-content: center;
   border: 2px solid #ff9800;
   color: #ff9800;
-  margin-bottom: 12px;
+  // margin-bottom: 12px;
 }
 
 .templateName {
@@ -215,4 +215,14 @@
   .empty {
     padding: 40px 24px;
   }
+}
+
+.loadingContainer{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    color: #999;
+    font-size: 16px;
+    text-align: center;
 }
