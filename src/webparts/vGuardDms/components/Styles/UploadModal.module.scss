@@ -375,5 +375,54 @@
     margin-top: 12px;
 }
 
+.renewalDateSection {
+  margin: 16px 35px;
+}
+
+.dateInput {
+  width: 25%;
+  padding: 10px 12px;
+  font-size: 14px;
+  border: 1px solid #d1d1d1;
+  border-radius: 4px;
+  color: #333;
+  background-color: #fff;
+  cursor: pointer;
+  margin-left: 10px;
+
+  &:hover {
+    outline: none;
+    border-color: #fa8c16;
+     background: #fffbf5;
+  }
+}
+
+.dateLabel{
+  color: #333;
+}
+
+.departmentDropdown {
+  width: 30%;
+  padding: 10px 12px;
+  font-size: 14px;
+  border: 1px solid #d1d1d1;
+  border-radius: 4px;
+  margin-left: 10px;
+  cursor: pointer;
+  background-color: #fff;
+
+  &:hover {
+    border-color: #fa8c16;
+     background: #fffbf5;
+  }
+
+   &:focus {
+    border-color: #fa8c16; 
+    background-color: #fff; 
+    outline: none;
+  }
+}
+
+
 
 

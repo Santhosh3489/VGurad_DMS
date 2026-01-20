@@ -53,36 +53,42 @@
 
 // View Toggle Styles
 .viewToggle {
-    display: flex;
-    gap: 4px;
-    background: white;
-    padding: 4px;
-    border-radius: 10px;
-     box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  background: #ffffff;
+  border-radius: 10px;
+  border: 1px solid #d0d0d0;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+  height: 100%; 
+  align-items: stretch;; 
 }
 
 .viewBtn {
-    padding: 8px 12px;
-    background: transparent;
-    border: none;
-    min-width: 44px;
-    border-radius: 10px;
-    cursor: pointer;
-    color: #666;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+  min-width: 34px;
+  min-height: 100%;
+  padding: 4px;
+  background: transparent;
+  border: none;
+  border-radius: 1.5px;
+  cursor: pointer;
 
-    &:hover {
-        color: #333;     
-    }
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-    &.activeView {
-        background: #fff;
-        color: #EE9B01;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
+  color: #9aa1aa;
+  transition: all 0.25s ease;
+
+  &:hover {
+    color: #6b7280;
+  }
+
+  &.activeView {
+    background: #fff8ed;              
+    color: #f59e0b;                   
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  }
 }
 
 // Content Wrapper
@@ -266,8 +272,6 @@
     }
 }
 
-
-/* Add these styles to your module.scss file */
 
 .searchWrapper {
     position: relative;

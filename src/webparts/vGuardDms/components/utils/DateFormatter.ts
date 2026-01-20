@@ -1,4 +1,4 @@
-
+import moment from "moment";
 export class DateFormatter {
     public static formatDate(dateString: string, format: string = 'MMM DD, YYYY'): string {
         if (!dateString) return '';
@@ -25,22 +25,13 @@ export class DateFormatter {
         });
     }
 
-     public static formatDateAndTime(dateString: string): string {
-        if (!dateString) return '';
+ public static formatDateAndTime(dateString: string): string {
+    if (!dateString) return '';
 
-         const date = new Date(dateString);
-
-         const datePart = date.toLocaleDateString('en-US', {
-           month: 'short',
-           day: 'numeric',
-      });
-
-        const timePart = date.toLocaleTimeString('en-US', {
-          hour: '2-digit',
-          minute: '2-digit',
-       });
-
-      return `${datePart} • ${timePart}`;
-    }
+   return moment(dateString).format('MMMM Do • h:mm a');
+  }
 
 }
+
+
+//•
