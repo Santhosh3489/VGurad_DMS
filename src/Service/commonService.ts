@@ -183,3 +183,7 @@ export const getAttachments = async (listName: string, id: number) => {
     console.log('error for fetching the attachment', error);
   }
 }
+
+export {
+  getSP // export const getCurrentUser = async () => {
+};

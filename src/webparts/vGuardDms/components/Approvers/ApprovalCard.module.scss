@@ -1,0 +1,86 @@
+.card {
+  border-radius: 16px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+}
+
+.topRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.left {
+  display: flex;
+  gap: 12px;
+}
+
+.iconBox {
+  width: 44px;
+  height: 44px;
+  background: #f5f7fa;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.fileInfo {
+  display: flex;
+  flex-direction: column;
+  max-width: 220px;
+}
+
+.title {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.subTitle {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.level {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.bottomRow {
+  margin-top: 16px;
+  padding: 12px 14px;
+  background: #fff6e5;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.date {
+  font-size: 14px;
+  color: #6b7280;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
+.requester {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+}
+
+.name {
+  font-size: 14px;
+  font-weight: 400;
+  color: #f57112;
+}
