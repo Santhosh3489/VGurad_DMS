@@ -70,6 +70,7 @@
 .requester {
   display: flex;
   align-items: center;
+  flex-direction: row;
   gap: 8px;
 }
 
@@ -81,6 +82,33 @@
 
 .name {
   font-size: 14px;
-  font-weight: 400;
+  font-weight: 500;
   color: #f57112;
+  margin-bottom: 5px;
+}
+
+.approvedCard {
+  cursor: not-allowed;
+  opacity: 0.75;
+}
+
+.cardContent {
+  width: 100%;
+}
+
+.ApprovedbottomRow {
+  margin-top: 16px;
+  padding: 12px 14px;
+  background-color: #EAF9F0;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.Approvedname {
+  font-size: 14px;
+  font-weight: 500;
+  color: #2E7D32;
+  margin-bottom: 5px;
 }

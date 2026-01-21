@@ -30,3 +30,12 @@ export interface IApprovalAction {
     approverEmail: string;
     comments?: string;
 }
+
+export interface ApproverAction {
+  requestId: string;
+  approverName: string;
+  approverEmail: string;
+  approvalLevel: 'L1' | 'L2' | 'L3';
+  action: 'Approve' | 'Reject';
+  comments?: string;
+}

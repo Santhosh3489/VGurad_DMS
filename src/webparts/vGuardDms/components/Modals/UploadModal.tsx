@@ -292,7 +292,7 @@ const UploadModal: React.FC<IUploadModalProps> = ({
                         disabled={uploading}
                      />
 
-                     <label className={styles.dateLabel} style={{marginLeft: '20px'}}>Department</label>
+                     <label className={styles.dateLabel} style={{marginLeft: '20px'}}>Department <span style={{color : "red"}}>*</span></label>
                      <select
                        className={styles.departmentDropdown}
                        value={department}
@@ -303,7 +303,7 @@ const UploadModal: React.FC<IUploadModalProps> = ({
                           fontWeight: "normal"
                         }}
                      >
-                          <option value=""  disabled hidden>Select Department</option>
+                          <option value=""  disabled hidden>Select Department </option>
                           {departments.map((dept) => (
                             <option key={dept} value={dept}>{dept}</option>
                           ))}
@@ -346,7 +346,7 @@ const UploadModal: React.FC<IUploadModalProps> = ({
                 <PrimaryButton
                     onClick={handleUpload}
                     text={uploading ? "Uploading..." : uploadStatus === 'success' ? "Uploaded" : "Upload Document"}
-                    disabled={!selectedFile || uploading || uploadStatus === 'success'}
+                    disabled={!selectedFile || uploading || uploadStatus === 'success' || !department}
                     styles={{
                         root: { minWidth: 120 }
                     }}

@@ -1,0 +1,213 @@
+.toprow {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid #f0f0f0; 
+  margin-bottom: 16px;
+  gap: 10px;
+}
+
+
+.viewStatus {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: black;
+  text-decoration: underline;
+  margin-left: 15px;
+  margin-bottom: 20px;
+
+  &::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #52c41a;
+  }
+
+  &:hover {
+    color: #389e0d;
+    &::before {
+      background-color: #389e0d;
+    }
+  }
+
+  &:active {
+    color: #237804;
+    &::before {
+      background-color: #237804;
+    }
+  }
+}
+
+:global {
+  .ant-drawer-header {
+    border-bottom: none !important;
+  }
+}
+
+.requesterDetails {
+  width: 490px;
+  height: 80px;
+  border: 1px solid #ffd591;
+  background-color: #fff7e6;
+  display: flex;
+  align-items: center;
+  padding: 16px 20px;
+  border-radius: 12px;
+  gap: 20px;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-top: 10px;
+}
+
+.right {
+  flex: 1;
+  margin-left: 15px;  
+}
+
+.divider {
+  width: 1px;
+  height: 40px;
+  background-color: #e0e0e0;
+}
+
+.label {
+  font-size: 12px;
+  color: #8c8c8c;
+  margin-bottom: 4px;
+}
+
+.value {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.fileCard {
+  margin-top: 16px;
+  border: 1px dashed #91caff;
+  background-color: #f0f7ff;
+  border-radius: 12px;
+  padding: 30px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #e6f4ff;
+  }
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.fileIcon {
+  width: 36px;
+  height: 36px;
+  background-color: #1677ff;
+  color: white;
+  border-radius: 6px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fileName {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.fileSize {
+  margin: 0;
+  font-size: 12px;
+  color: #8c8c8c;
+}
+
+.viewIcon {
+  font-size: 16px;
+  color: #8c8c8c;
+}
+
+.wordIcon {
+  width: 36px;
+  height: 36px;
+  background-color: #185abd;
+  color: white;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.viewIcon {
+  font-size: 18px;
+  color: #8c8c8c;
+}
+
+.footerActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+}
+
+.rejectBtn {
+  min-width: 140px;
+  height: 44px;
+  border-radius: 999px;
+  background-color: #fff1f0;   
+  color: #ff4d4f;              
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.rejectBtn:hover {
+  background-color: #ffe4e3;
+}
+
+.approveBtn {
+  padding: 10px 38px;
+  border-radius: 24px;
+  border: none;
+  background-color: #22c55e;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.approveBtn:hover {
+  background-color: #16a34a;
+}
+
+
+
+
+

@@ -25,6 +25,7 @@
     "@pnp/logging": "^4.17.0",
     "@pnp/sp": "^4.17.0",
     "antd": "^5.29.3",
+    "lottie-react": "^2.4.1",
     "lucide-react": "^0.562.0",
     "moment": "^2.30.1",
     "react": "17.0.1",

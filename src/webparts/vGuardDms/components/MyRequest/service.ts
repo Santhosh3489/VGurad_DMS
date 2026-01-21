@@ -49,10 +49,30 @@ export const getApproversByLevel = async (level: 'L1_Approver' | 'L2_Approver' |
 const createApprovalTrackingRecords = async (requestId: string, params: ICreateRequestParams): Promise<void> => {
     const sp: SPFI = getSP();
     try {
-        const l1Approvers = await getApproversByLevel('L1_Approver');
-        const l2Approvers = await getApproversByLevel('L2_Approver');
-        const l3Approvers = await getApproversByLevel('L3_Approver');
-        const currentUser = params.requesterName;
+
+         const department = params.department;
+        
+         // Get L1 approvers for this department
+        const l1Approvers = await sp.web.lists
+            .getByTitle('User_Configuration')
+            .items
+            .filter(`ApprovelLevel eq 'L1_Approver' and ApproverAccess eq 1 and Department eq '${department}'`)
+            .select('UserName', 'UserEmailId')();
+
+            // Get L2 approvers for this department
+        const l2Approvers = await sp.web.lists
+            .getByTitle('User_Configuration')
+            .items
+            .filter(`ApprovelLevel eq 'L2_Approver' and ApproverAccess eq 1 and Department eq '${department}'`)
+            .select('UserName', 'UserEmailId')();
+
+        // Get L3 approvers for this department
+        const l3Approvers = await sp.web.lists
+            .getByTitle('User_Configuration')
+            .items
+            .filter(`ApprovelLevel eq 'L3_Approver' and ApproverAccess eq 1 and Department eq '${department}'`)
+            .select('UserName', 'UserEmailId')();
+
 
         if (l1Approvers.length > 0) {
             await sp.web.lists.getByTitle('Req_Approval_Lvl_Details').items.add({
@@ -226,16 +246,41 @@ export const processApprovalAction = async (params: IApprovalAction): Promise<vo
                 ApprovedDate: new Date().toISOString(),
                 Comments: comments || ''
             });
+            
+if (action === 'Reject') {
 
-            if (action === 'Reject') {
-                await updateMainRequestStatus(requestId, 'Rejected', `${approvalLevel} Rejected`);
-            } else if (action === 'Approve') {
-                const nextLevel = approvalLevel === 'L1' ? 'L2' : 'L3';
-                await updateMainRequestStatus(requestId, 'InProgress', `${nextLevel} Pending`);
-            }
-            if (approvalLevel === 'L3') {
-                await updateMainRequestStatus(requestId, 'Approved', 'Completed');
-            }
+  await updateMainRequestStatus(
+    requestId,
+    'Rejected',
+    `${approvalLevel} Rejected`
+  );
+  return; 
+}
+
+if (action === 'Approve') {
+  if (approvalLevel === 'L1') {
+    await updateMainRequestStatus(
+      requestId,
+      'InProgress',
+      'L2 Pending'
+    );
+  } 
+  else if (approvalLevel === 'L2') {
+    await updateMainRequestStatus(
+      requestId,
+      'InProgress',
+      'L3 Pending'
+    );
+  } 
+  else if (approvalLevel === 'L3') {
+    await updateMainRequestStatus(
+      requestId,
+      'Approved',
+      'Completed'
+    );
+  }
+}
+
         }
     } catch (error) {
         console.log('Error processing approval action:', error);

@@ -1,0 +1,73 @@
+.confirmModal :global(.ant-modal-content) {
+  border-radius: 24px;
+  padding: 40px 32px;
+}
+
+/* ---------- CONFIRM STATE ---------- */
+
+.confirmText {
+  font-size: 20px;
+  font-weight: 500;
+  color: #1f2937;
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+}
+
+.cancelBtn {
+  min-width: 140px;
+  height: 44px;
+  border-radius: 999px;
+  background-color: #f3f4f6;
+  color: #6b7280;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.cancelBtn:hover {
+  background-color: #e5e7eb;
+}
+
+.confirmBtn {
+  min-width: 140px;
+  height: 44px;
+  border-radius: 999px;
+  background-color: #22c55e;
+  color: #ffffff;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.confirmBtn:hover {
+  background-color: #16a34a;
+}
+
+/* ---------- SUCCESS STATE ---------- */
+
+.successContent {
+  text-align: center;
+}
+
+.animation {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 24px;
+}
+
+.successTitle {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.successSubtitle {
+  font-size: 14px;
+  color: #6b7280;
+}
