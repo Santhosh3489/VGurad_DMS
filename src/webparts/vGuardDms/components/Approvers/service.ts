@@ -99,7 +99,7 @@ export const approveDocument = async ({
 
       if (!nextLevel) {
         newMainStatus = 'Completed';
-        newLevelStatus = 'All Approved';
+        newLevelStatus = 'Completed';
       }
     } else {
 
@@ -345,6 +345,142 @@ export const getApprovedRequestsForApprover = async (
 
   } catch (error) {
     console.error('Error fetching approved requests:', error);
+    return [];
+  }
+};
+
+export const getRejectedRequestsForApprover = async (
+  userEmail: string
+): Promise<any[]> => {
+
+  const sp: SPFI = getSP();
+
+  try {
+    const accessMap = await getApproverAccessMap(userEmail);
+
+    if (!accessMap || Object.keys(accessMap).length === 0) {
+      return [];
+    }
+
+    
+    const allowedLevelSet = new Set<string>();
+    Object.values(accessMap).forEach(levels => {
+      levels.forEach(level => {
+        allowedLevelSet.add(level.replace('_Approver', ' Approval'));
+      });
+    });
+
+    const levelFilter = Array.from(allowedLevelSet)
+      .map(level => `Req_Level eq '${level}'`)
+      .join(' or ');
+
+    
+    const approvalItems = await sp.web.lists
+      .getByTitle('Req_Approval_Lvl_Details')
+      .items
+      .filter(
+        `Assigned_MailId eq '${userEmail}' and Level_Status eq 'Rejected' and (${levelFilter})`
+      )();
+
+    if (!approvalItems.length) return [];
+
+   
+    const results = await Promise.all(
+      approvalItems.map(async approval => {
+
+        const req = await sp.web.lists
+          .getByTitle('DMS_Request')
+          .items
+          .filter(`RequestId eq '${approval.RequestId}'`)
+          .top(1)();
+
+        if (!req.length) return null;
+
+        const dept = req[0].Department;
+        const reqLevel = approval.Req_Level.replace(' Approval', '_Approver');
+
+        if (!accessMap[dept]) return null;
+        if (!accessMap[dept].includes(reqLevel)) return null;
+
+        return {
+          ...req[0],
+          approvalDetails: approval
+        };
+      })
+    );
+
+    return results.filter(Boolean);
+
+  } catch (error) {
+    console.error('Error fetching rejected approvals:', error);
+    return [];
+  }
+};
+
+
+export const getAllRequestsForApprover = async (
+  userEmail: string
+): Promise<any[]> => {
+
+  const sp: SPFI = getSP();
+
+  try {
+    const accessMap = await getApproverAccessMap(userEmail);
+
+    if (!accessMap || Object.keys(accessMap).length === 0) {
+      return [];
+    }
+
+    // Allowed approval levels
+    const allowedLevelSet = new Set<string>();
+    Object.values(accessMap).forEach(levels => {
+      levels.forEach(level => {
+        allowedLevelSet.add(level.replace('_Approver', ' Approval'));
+      });
+    });
+
+    const levelFilter = Array.from(allowedLevelSet)
+      .map(level => `Req_Level eq '${level}'`)
+      .join(' or ');
+
+    // 🔹 Fetch ALL (Pending + Approved + Rejected)
+    const approvalItems = await sp.web.lists
+      .getByTitle('Req_Approval_Lvl_Details')
+      .items
+      .filter(
+        `Assigned_MailId eq '${userEmail}' and (${levelFilter})`
+      )();
+
+    if (!approvalItems.length) return [];
+
+    const results = await Promise.all(
+      approvalItems.map(async approval => {
+
+        const req = await sp.web.lists
+          .getByTitle('DMS_Request')
+          .items
+          .filter(`RequestId eq '${approval.RequestId}'`)
+          .top(1)();
+
+        if (!req.length) return null;
+
+        const dept = req[0].Department;
+        const reqLevel = approval.Req_Level.replace(' Approval', '_Approver');
+
+        if (!accessMap[dept]) return null;
+        if (!accessMap[dept].includes(reqLevel)) return null;
+
+        return {
+          ...req[0],
+          approvalDetails: approval
+        };
+      })
+    );
+
+    return results.filter(Boolean);
+
+  } catch (error) {
+    console.error('Error fetching all approvals:', error);
     return [];
   }
 };

@@ -24,15 +24,50 @@ const UploadModal: React.FC<IUploadModalProps> = ({
     const [uploading, setUploading] = React.useState(false);
     const [uploadStatus, setUploadStatus] = React.useState<'idle' | 'success' | 'error'>('idle');
     const [error, setError] = React.useState('');
-    const [renewalDate, setRenewalDate] = React.useState<string>('');
-    const [department, setDepartment] = React.useState<string>('');
+    const [documentType, setDocumentType] = React.useState('');
+    const [mandatoryFields, setMandatoryFields] = React.useState<string[]>([]);
+    const [optionalFields, setOptionalFields] = React.useState<string[]>([]);
+    const [dynamicValues, setDynamicValues] = React.useState<Record<string,string | Date>>({});
+    const [metadataMap, setMetadataMap] = React.useState<Record<string,{ label: string; order: number }>>({});
+    const [docTypeChoices, setDocTypeChoices] = React.useState<string[]>([]);
 
     const fileInputRef = React.useRef<HTMLInputElement>(null);
-
-    const departments = ['HR', 'IT', 'Admin'];
-
-
     const sp: SPFI = getSP();
+
+    React.useEffect(() => {
+        const loadChoices = async () => {
+        const field = await sp.web.lists
+        .getByTitle("DMS_Request")
+        .fields.getByInternalNameOrTitle("Document_Type")
+        .select("Choices")();
+        
+        setDocTypeChoices(field.Choices);
+    }
+    loadChoices();
+},[]);
+
+    React.useEffect(() => {
+        const loadMetadataFields = async () => {
+            const items = await sp.web.lists
+                          .getByTitle("Document_Metadata_Fields")
+                          .items
+                          .filter("Active eq 1")
+                          .select("Title","Field_Id", "Order")();
+
+                const map: any = {};
+                items.forEach(i => {
+                    map[i.Field_Id] = {
+                        label: i.Title,
+                        order: i.Order
+                    }
+                })
+                
+                setMetadataMap(map);
+        };
+
+        loadMetadataFields();
+    },[]);
+
 
     const handleDrag = (e: React.DragEvent) => {
         e.preventDefault();
@@ -92,76 +127,6 @@ const UploadModal: React.FC<IUploadModalProps> = ({
         setError('');
     };
 
-    const handleUpload = async () => {
-        if (!selectedFile) {
-            setError('Please select a file');
-            setUploadStatus('error');
-            return;
-        }
-        try {
-            setUploading(true);
-            setError('');
-            setUploadStatus('idle');
-
-            const user = await getCurrentUser();
-            const userEmail = user?.mail || user?.userPrincipalName;
-            const userName = user?.displayName;
-
-            if (!userEmail || !userName) {
-                throw new Error('Unable to get the user information');
-            }
-
-            const folderPath = currentFolderPath || '/sites/Developsite/DMS';
-            console.log('Uploading to folder:', folderPath);
-
-            const folder = sp.web.getFolderByServerRelativePath(folderPath);
-
-            const uploadResult = await folder.files.addUsingPath(
-                selectedFile.name,
-                selectedFile,
-                { Overwrite: true }
-            )
-
-            const fileUrl = uploadResult.ServerRelativeUrl;
-            const formattedRenewalDate = moment(renewalDate, 'YYYY-MM-DD').toDate();
-
-
-            const requestId = await createDMSRequest({
-                folderURL: fileUrl,
-                requesterName: userName,
-                requesterEmail: userEmail,
-                renewalDate: formattedRenewalDate,
-                department: department
-            });
-
-            console.log(`DMS request ${requestId} created successfully`);
-            const spFile = sp.web.getFileByServerRelativePath(fileUrl);
-
-            const fileItem = await spFile.getItem();
-            await fileItem.update({
-                RequestId: requestId,
-                Status: "L1 Approval Pending"
-            })
-            console.log('File uploaded successfully to:', fileUrl);
-
-            setUploadStatus('success');
-            setUploading(false);
-
-            setTimeout(() => {
-                if (onUploadSuccess) {
-                    onUploadSuccess();
-                }
-                handleClose();
-            }, 1500);
-
-        } catch (error: any) {
-            console.log("Upload error", error);
-            setError(error.message);
-            setUploadStatus('error');
-            setUploading(false);
-        }
-    }
-
     const handleClose = () => {
         if (!uploading) {
             setSelectedFile(null);
@@ -200,6 +165,194 @@ const UploadModal: React.FC<IUploadModalProps> = ({
         closeButtonAriaLabel: 'Close',
     };
 
+    const handleDocumentTypeChange = async (docType: string) => {
+        setDocumentType(docType);
+
+        try {
+            const item = await sp.web.lists
+                .getByTitle("Document_Type")
+                .items
+                .filter(`Title eq '${docType}' and Active eq 1`)
+                .top(1)();
+
+            if (item.length > 0) {
+                // Filter out DTE from mandatory fields
+                const mandatory = item[0].Mandatory_Field_Id
+                    ?.split(',')
+                    .map((f: string) => f.trim())
+                    .filter(f => f !== 'DTE'); // Exclude DTE
+
+                // Filter out DTE from optional fields
+                const optional = item[0].Optional_Field_Id
+                    ?.split(',')
+                    .map((f: string) => f.trim())
+                    .filter(f => f !== 'DTE'); // Exclude DTE
+
+                setMandatoryFields(mandatory || []);
+                setOptionalFields(optional || []);
+            } else {
+                setMandatoryFields([]);
+                setOptionalFields([]);
+            }
+        } catch (error) {
+            console.error("Error fetching document type config", error);
+            setMandatoryFields([]);
+            setOptionalFields([]);
+        }
+    }
+
+   
+    const sortByOrder = (fields: string[]) =>
+        fields
+            .filter(f => metadataMap[f])
+            .sort((a, b) => metadataMap[a].order - metadataMap[b].order);
+
+    
+    const renderInput = (fieldId: string, required: boolean) => {
+       
+        if (fieldId === 'DTE') {
+            return null;
+        }
+
+        const meta = metadataMap[fieldId];
+        const label = meta?.label || fieldId;
+
+        const isDateField = fieldId === 'ER' || fieldId === 'CD';
+
+        return (
+            <div key={fieldId} className={styles.dynamicField}>
+                <label>
+                    {label} {required && <span style={{ color: 'red' }}>*</span>}
+                </label>
+                <input
+                    type={isDateField ? 'date' : 'text'}
+                    value={
+                        isDateField && dynamicValues[fieldId] instanceof Date
+                            ? moment(dynamicValues[fieldId]).format('YYYY-MM-DD')
+                            : (dynamicValues[fieldId] as string) || ''
+                    }
+                    onChange={(e) =>
+                        setDynamicValues(prev => ({
+                            ...prev,
+                            [fieldId]: isDateField
+                                ? new Date(e.target.value)
+                                : e.target.value
+                        }))
+                    }
+                />
+            </div>
+        )
+    }
+
+    const handleUpload = async () => {
+        if (!selectedFile) {
+            setError('Please select a file');
+            setUploadStatus('error');
+            return;
+        }
+        try {
+          
+            for (const field of mandatoryFields) {
+                const value = dynamicValues[field];
+                if (
+                    value === undefined ||
+                    value === null ||
+                    value === '' ||
+                    value instanceof Date && isNaN(value.getTime())
+                ) {
+                    setError("Please fill mandatory fields");
+                    setUploadStatus('error');
+                    return;
+                }
+            }
+
+            setUploading(true);
+            setError('');
+            setUploadStatus('idle');
+
+            const user = await getCurrentUser();
+            const userEmail = user?.mail || user?.userPrincipalName;
+            const userName = user?.displayName;
+
+            if (!userEmail || !userName) {
+                throw new Error('Unable to get the user information');
+            }
+
+            const folderPath = currentFolderPath || '/sites/Developsite/DMS';
+            console.log('Uploading to folder:', folderPath);
+
+            const folder = sp.web.getFolderByServerRelativePath(folderPath);
+
+            const uploadResult = await folder.files.addUsingPath(
+                selectedFile.name,
+                selectedFile,
+                { Overwrite: true }
+            )
+
+            const fileUrl = uploadResult.ServerRelativeUrl;
+            const department = dynamicValues["DP"] as string;
+            const renewalDate = dynamicValues["ER"] as Date | undefined;
+
+           
+            const dmsRequestParams: any = {
+                folderURL: fileUrl,
+                requesterName: userName,
+                requesterEmail: userEmail,
+                department: department,
+                renewalDate: renewalDate ?? null,
+                Document_Type: documentType 
+            };
+
+          
+            Object.keys(dynamicValues).forEach(fieldId => {
+                const value = dynamicValues[fieldId];
+                if (value !== undefined && value !== null && value !== '') {
+                    if (fieldId !== 'DP' && fieldId !== 'DTE' && fieldId !== 'ER') { 
+                        dmsRequestParams[fieldId] = value;
+                    }
+                }
+            });
+
+            const requestId = await createDMSRequest(dmsRequestParams);
+
+            console.log(`DMS request ${requestId} created successfully`);
+            
+            const spFile = sp.web.getFileByServerRelativePath(fileUrl);
+            const fileItem = await spFile.getItem();
+           
+            const metadataUpdate: any = {
+                RequestId: requestId,
+                Status: "L1 Approval Pending"
+            };
+            
+            if (dynamicValues["DT"]) {
+                metadataUpdate.Title = dynamicValues["DT"];
+            } else {
+                metadataUpdate.Title = selectedFile.name;
+            }
+            
+            await fileItem.update(metadataUpdate);
+
+            console.log('File uploaded successfully to:', fileUrl);
+
+            setUploadStatus('success');
+            setUploading(false);
+
+            setTimeout(() => {
+                if (onUploadSuccess) {
+                    onUploadSuccess();
+                }
+                handleClose();
+            }, 1500);
+
+        } catch (error: any) {
+            console.log("Upload error", error);
+            setError(error.message);
+            setUploadStatus('error');
+            setUploading(false);
+        }
+    }
+
     return (
         <Dialog
             hidden={!isOpen}
@@ -229,6 +382,24 @@ const UploadModal: React.FC<IUploadModalProps> = ({
                 }
             }}
         >
+
+          <label className={styles.dateLabel}>
+                Document Type <span style={{ color: "red"}}> * </span>
+          </label>
+
+          <select
+            className={styles.departmentDropdown}
+            value={documentType}
+            onChange={(e) => handleDocumentTypeChange(e.target.value)}
+            disabled={uploading}
+          >
+             
+             <option value="" disabled hidden>Select Document Type</option>
+            {docTypeChoices.map(choice => (
+               <option key={choice} value={choice}>{choice}</option>
+             ))}
+          </select>
+
             <input
                 ref={fileInputRef}
                 type="file"
@@ -282,33 +453,14 @@ const UploadModal: React.FC<IUploadModalProps> = ({
                     </div>
                 )}
 
-                <div className={styles.renewalDateSection}>
-                    <label className={styles.dateLabel}>Renewal Date</label>
-                     <input
-                        type="date"
-                        className={styles.dateInput}
-                        value={renewalDate}
-                        onChange={(e) => setRenewalDate(e.target.value)}
-                        disabled={uploading}
-                     />
-
-                     <label className={styles.dateLabel} style={{marginLeft: '20px'}}>Department <span style={{color : "red"}}>*</span></label>
-                     <select
-                       className={styles.departmentDropdown}
-                       value={department}
-                       onChange={(e) => setDepartment(e.target.value)}
-                       disabled={uploading}
-                       style={{
-                          color: department === "" ? "#333" : "#000",
-                          fontWeight: "normal"
-                        }}
-                     >
-                          <option value=""  disabled hidden>Select Department </option>
-                          {departments.map((dept) => (
-                            <option key={dept} value={dept}>{dept}</option>
-                          ))}
-                     </select>
-                </div>
+                {mandatoryFields.length > 0 && (
+                    <>
+                     <div className={styles.inputGrid}>
+                       {sortByOrder(mandatoryFields).map(f => renderInput(f, true))}
+                       {sortByOrder(optionalFields).map(f => renderInput(f, false))}
+                       </div>
+                    </>
+                )}
 
                 {uploadStatus === 'success' && (
                     <MessageBar
@@ -346,7 +498,7 @@ const UploadModal: React.FC<IUploadModalProps> = ({
                 <PrimaryButton
                     onClick={handleUpload}
                     text={uploading ? "Uploading..." : uploadStatus === 'success' ? "Uploaded" : "Upload Document"}
-                    disabled={!selectedFile || uploading || uploadStatus === 'success' || !department}
+                    disabled={!selectedFile || uploading || uploadStatus === 'success' || !documentType || mandatoryFields.some(f => !dynamicValues[f])}
                     styles={{
                         root: { minWidth: 120 }
                     }}

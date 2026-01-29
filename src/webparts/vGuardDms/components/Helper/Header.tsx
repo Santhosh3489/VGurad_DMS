@@ -11,6 +11,8 @@ const Header: React.FC<IHeaderProps> = ({
     onTabChangeForRequest,
     pendingCount = 0,
     completedCount = 0,
+    rejectedCount = 0,
+    totalCount = 0,
     activeTabForApprover,
     onTabChangeForApprover
 }) => {
@@ -41,6 +43,18 @@ const Header: React.FC<IHeaderProps> = ({
                         >
                             Completed
                             <span className={styles.pillCount}>{completedCount}</span>
+                        </button>
+                         <button
+                            className={`${styles.pillTab} ${activeTabForRequest === 'rejected' ? styles.activePill : ''}`}
+                            onClick={() => onTabChangeForRequest('rejected')}>
+                            Rejected
+                            <span className={styles.pillCount}>{rejectedCount}</span>
+                        </button>
+                         <button
+                            className={`${styles.pillTab} ${activeTabForRequest === 'totalRequests' ? styles.activePill : ''}`}
+                            onClick={() => onTabChangeForRequest('totalRequests')}>
+                            Total Requests
+                            <span className={styles.pillCount}>{totalCount}</span>
                         </button> 
                     </div>
                 )}
@@ -57,6 +71,16 @@ const Header: React.FC<IHeaderProps> = ({
                             onClick={() => onTabChangeForApprover('approved')} >
                             Approved
                         </button>
+                        <button
+                            className={`${styles.pillTab} ${activeTabForApprover === 'rejected' ? styles.activePill : ''}`}
+                            onClick={() => onTabChangeForApprover('rejected')}>
+                            Rejected
+                        </button>
+                         <button
+                            className={`${styles.pillTab} ${activeTabForApprover === 'totalRequests' ? styles.activePill : ''}`}
+                            onClick={() => onTabChangeForApprover('totalRequests')}>
+                            Total Requests
+                        </button> 
                     </div>
                 )}
             </div>

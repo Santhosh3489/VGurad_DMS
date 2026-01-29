@@ -269,7 +269,7 @@ const DocsLibrary: React.FC<IDocsLibraryProps> = ({
             }
         };
 
-        loadInitialData();
+       void loadInitialData();
     }, []);
 
     React.useEffect(() => {
@@ -361,7 +361,7 @@ const DocsLibrary: React.FC<IDocsLibraryProps> = ({
 
 
     React.useEffect(() => {
-        loadFolder(initialPath).catch((err) => {
+     void loadFolder(initialPath).catch((err) => {
             console.error('Failed to load initial folder:', err);
             setError('Failed to load initial folder');
         });

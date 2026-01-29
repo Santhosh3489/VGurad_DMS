@@ -8,12 +8,14 @@ export interface IHeaderProps {
     showViewToggle?: boolean;
     currentView?: 'list' | 'grid';
     onViewChange?: (view: 'list' | 'grid') => void;
-    activeTabForRequest?: 'pending' | 'completed';
-    onTabChangeForRequest?: (tab: 'pending' | 'completed') => void;
+    activeTabForRequest?: 'pending' | 'completed' | 'rejected' | 'totalRequests';
+    onTabChangeForRequest?: (tab: 'pending' | 'completed' | 'rejected' | 'totalRequests') => void;
     pendingCount?: number;
     completedCount?: number;
-    activeTabForApprover?: 'pending' | 'approved';
-    onTabChangeForApprover?: (tab: 'pending' | 'approved') => void;
+    rejectedCount?: number;
+    totalCount?: number;
+    activeTabForApprover?: 'pending' | 'approved' |  'rejected' | 'totalRequests';
+    onTabChangeForApprover?: (tab: 'pending' | 'approved' |  'rejected' | 'totalRequests') => void;
 }
 
 // Breadcrumb Service Details .............

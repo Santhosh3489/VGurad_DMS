@@ -204,29 +204,29 @@ const updateMainRequestStatus = async (requestId: string, status: string, levelS
     }
 }
 
-export const createDMSRequest = async (params: ICreateRequestParams): Promise<string> => {
-    const sp: SPFI = getSP();
-    try {
-        const requestId = await generateRequestId();
-        await sp.web.lists.getByTitle('DMS_Request').items.add({
-            RequestId: requestId,
-            FolderURL: params.folderURL,
-            Status: 'InProgress',
-            Level_Status: 'L1 Pending',
-            Requester_Name: params.requesterName,
-            Requester_MailId: params.requesterEmail,
-            Renewal_date: params.renewalDate,
-            Department: params.department
-        });
+// export const createDMSRequest = async (params: ICreateRequestParams): Promise<string> => {
+//     const sp: SPFI = getSP();
+//     try {
+//         const requestId = await generateRequestId();
+//         await sp.web.lists.getByTitle('DMS_Request').items.add({
+//             RequestId: requestId,
+//             FolderURL: params.folderURL,
+//             Status: 'InProgress',
+//             Level_Status: 'L1 Pending',
+//             Requester_Name: params.requesterName,
+//             Requester_MailId: params.requesterEmail,
+//             Renewal_date: params.renewalDate,
+//             Department: params.department,
+//         });
 
-        console.log("Entry in dms");
-        await createApprovalTrackingRecords(requestId, params);
-        return requestId;
-    } catch (error) {
-        console.log('Error creating DMS request:', error);
-        throw error;
-    }
-}
+//         console.log("Entry in dms");
+//         await createApprovalTrackingRecords(requestId, params);
+//         return requestId;
+//     } catch (error) {
+//         console.log('Error creating DMS request:', error);
+//         throw error;
+//     }
+// }
 
 export const processApprovalAction = async (params: IApprovalAction): Promise<void> => {
     const sp: SPFI = getSP();
@@ -243,7 +243,7 @@ export const processApprovalAction = async (params: IApprovalAction): Promise<vo
                 Level_Status: action === 'Approve' ? 'Approved' : 'Rejected',
                 Approver_Name: approverName,
                 Approver_MailId: approverEmail,
-                ApprovedDate: new Date().toISOString(),
+                Approved_Date: new Date().toISOString(),
                 Comments: comments || ''
             });
             
@@ -297,7 +297,7 @@ export const getUserRequestsWithDetails = async (userEmail: string): Promise<any
             .filter(`Requester_MailId eq '${userEmail}'`)
             .orderBy('Created', false)();
 
-        // For each request, get approval details
+        
         const requestsWithDetails = await Promise.all(
             requests.map(async (request) => {
                 const approvalDetails = await sp.web.lists
@@ -306,17 +306,34 @@ export const getUserRequestsWithDetails = async (userEmail: string): Promise<any
                     .filter(`RequestId eq '${request.RequestId}'`)
                     .orderBy('Req_Level', true)();
 
+               
+                const assignedApprovers = approvalDetails.map(ad => ({
+                    level: ad.Req_Level,            
+                    assignedUser: ad.Assigned_UserName,
+                    status: ad.Level_Status         
+                }));
+
+                const currentApprover = approvalDetails
+                    .filter(ad => ad.Level_Status === 'Pending' || ad.Level_Status === 'Rejected')
+                    .map(ad => ad.Assigned_UserName);
+
+
                 return {
                     ...request,
-                    approvalLevels: approvalDetails
-                }
-            }))
+                    approvalLevels: approvalDetails,
+                    assignedApprovers,
+                    currentApprover  
+                };
+            })
+        );
+
         return requestsWithDetails;
     } catch (error) {
         console.log('Error fetching user requests:', error);
         throw error;
     }
-}
+};
+
 
 
 export const getPendingApprovalsForUser = async (userEmail: string): Promise<any[]> => {
@@ -352,3 +369,123 @@ export const getApprovalLevelsByRequestId = async (requestId: string) => {
             'Approved_Date'
         )();
 };
+
+export const createDMSRequest = async (params: ICreateRequestParams): Promise<string> => {
+    const sp: SPFI = getSP();
+    try {
+        const requestId = await generateRequestId();
+        
+        const dmsRequestData: any = {
+            RequestId: requestId,
+            FolderURL: params.folderURL,
+            Status: 'InProgress',
+            Level_Status: 'L1 Pending',
+            Requester_Name: params.requesterName,
+            Requester_MailId: params.requesterEmail,
+            Renewal_date: params.renewalDate,
+            Department: params.department,
+            Document_Type: params.Document_Type,
+        };
+        
+
+        if (params.DT) {
+            dmsRequestData.Document_Title = params.DT;
+        }
+        
+       
+        if (params.AT) {
+            dmsRequestData.Doc_Author = params.AT;
+        }
+        
+       
+        if (params.CD) {
+            dmsRequestData.Creation_Date = params.CD;
+        }
+        
+        
+        if (params.VS) {
+            dmsRequestData.version = params.VS; 
+        }
+        
+      
+        if (params.CL) {
+            dmsRequestData.Confidentiality_Level = params.CL;
+        }
+        
+        
+        if (params.KT) {
+            dmsRequestData.Keywords= params.KT;
+        }
+        
+      
+        if (params.PC) {
+            dmsRequestData.Project_Code = params.PC;
+        }
+        
+       
+        if (params.CN) {
+            dmsRequestData.Customer_Name = params.CN;
+        }
+        
+     
+        if (params.AS) {
+            dmsRequestData.Approval_Status = params.AS;
+        }
+        
+    
+        if (params.VN) {
+            dmsRequestData.Vender_Name = params.VN;
+        }
+        
+       
+        if (params.CC) {
+            dmsRequestData.Cost_Centre = params.CC;
+        }
+        
+     
+        if (params.RB) {
+            dmsRequestData.Regulatory_body = params.RB;
+        }
+        
+   
+        if (params.JR) {
+            dmsRequestData.Job_Role = params.JR;
+        }
+        
+        if (params.MN) {
+            dmsRequestData.Manager_Name = params.MN;
+        }
+
+        if (params.RC) {
+            dmsRequestData.Related_Courses = params.RC;
+        }
+        
+        if (params.FY) {
+            dmsRequestData.Fiscal_year = params.FY;
+        }
+
+        if (params.EN) {
+            dmsRequestData.Employee_Name = params.EN;
+        }
+        
+
+        if (params.RS) {
+            dmsRequestData.Related_Specs = params.RS;
+        }
+        
+        if (params.RD) {
+            dmsRequestData.Related_Docs = params.RD;
+        } 
+
+        console.log("Creating DMS request with data:", dmsRequestData);
+        
+        await sp.web.lists.getByTitle('DMS_Request').items.add(dmsRequestData);
+
+        console.log("Entry created in DMS_Request");
+        await createApprovalTrackingRecords(requestId, params);
+        return requestId;
+    } catch (error) {
+        console.log('Error creating DMS request:', error);
+        throw error;
+    }
+}
