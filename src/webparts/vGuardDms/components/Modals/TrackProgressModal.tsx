@@ -24,7 +24,7 @@ export const TrackProgressModal: React.FC<ITrackProgressModalProps> = ({
 React.useEffect(() => {
   const fetchData = async () => {
     if (isOpen && request) {
-      await fetchApprovalData();
+     void fetchApprovalData();
     }
   };
 

@@ -105,7 +105,7 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     column-gap: 20px;   
-    row-gap: 55px;
+    row-gap: 26px;
 
     @media (max-width: 768px) {
         grid-template-columns: 1fr;

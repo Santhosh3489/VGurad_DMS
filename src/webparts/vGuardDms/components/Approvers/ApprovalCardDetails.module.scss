@@ -125,8 +125,6 @@
   width: 90%;
   justify-content: space-between;
   align-items: center;
-  height: 95%;
-  gap: 3px;
 }
 
 .left {
@@ -224,3 +222,40 @@
 .approveBtn:hover {
   background-color: #16a34a;
 }
+
+
+
+.rejectionBox {
+  margin-top: 16px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background-color: #fff1f0;
+  border: 1px solid #ffccc7;
+}
+
+.rejectTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: #cf1322;
+  margin-bottom: 6px;
+}
+
+.rejectReason {
+  font-size: 14px;
+  color: #5c0011;
+  line-height: 1.4;
+}
+
+.EyeIcon{
+  
+  cursor: pointer;
+  
+   &:hover{
+     color: blue;
+
+   }
+}
+
+
+
+

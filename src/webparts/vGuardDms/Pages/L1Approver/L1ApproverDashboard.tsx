@@ -4,7 +4,9 @@ import styles from './L1ApproverDashboard.module.scss';
 import Header from '../../components/Helper/Header';
 import {
   getPendingRequestsForApprover,
-  getApprovedRequestsForApprover
+  getApprovedRequestsForApprover,
+  getRejectedRequestsForApprover,
+  getAllRequestsForApprover
 } from '../../components/Approvers/service';
 import { getCurrentUser } from '../../../../Service/commonService';
 import { Search } from 'lucide-react';
@@ -12,14 +14,16 @@ import { Col, Empty, Row } from 'antd/es';
 
 const L1ApproverDashboard = () => {
   const [requests, setRequests] = useState<any[]>([]);
-  const [activeTab, setActiveTab] = useState<'pending' | 'approved'>('pending');
+  const [activeTab, setActiveTab] = useState<'pending' | 'approved' | 'rejected' | 'totalRequests'>('pending');
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentUserEmail, setCurrentUserEmail] = useState<string>('');
-
-  // FIX 1: Line 32 - Wrap fetchUserEmail in async function with void operator
+  
   useEffect(() => {
-    const fetchUserEmail = async () => {
+    void fetchUserEmail();
+  }, []); 
+
+   const fetchUserEmail = async () => {
       try {
         const user = await getCurrentUser();
         const email = user.mail || user.userPrincipalName;
@@ -30,12 +34,14 @@ const L1ApproverDashboard = () => {
       }
     };
 
-    void fetchUserEmail();
-  }, []);
 
   // FIX 2: Line 59 - Wrap loadRequests in async function with void operator
   useEffect(() => {
-    const loadRequests = async () => {
+   void loadRequests();
+  }, [activeTab, currentUserEmail]); 
+
+
+      const loadRequests = async () => {
       if (!currentUserEmail) {
         console.log('Waiting for user email...');
         return;
@@ -43,10 +49,21 @@ const L1ApproverDashboard = () => {
 
       try {
         setLoading(true);
-        const data =
-          activeTab === 'pending'
-            ? await getPendingRequestsForApprover(currentUserEmail)
-            : await getApprovedRequestsForApprover(currentUserEmail);
+
+         let data: any[] = []; 
+
+            if(activeTab === "pending"){ 
+              data = await getPendingRequestsForApprover(currentUserEmail);
+            }
+            else if (activeTab === "approved") {
+              data =  await getApprovedRequestsForApprover(currentUserEmail);
+            }
+            else if (activeTab === "rejected"){
+               data = await getRejectedRequestsForApprover(currentUserEmail);
+            }
+            else{
+               data = await getAllRequestsForApprover(currentUserEmail);
+            }
 
         console.log("Loading data for:", currentUserEmail, data);
         setRequests(data);
@@ -57,40 +74,20 @@ const L1ApproverDashboard = () => {
       }
     };
 
-    void loadRequests();
-  }, [activeTab, currentUserEmail]);
-
-  // FIX 3: Line 75 - Add hasOwnProperty check for guard-for-in rule
   const filteredRequests = useMemo(() => {
     if (!searchTerm.trim()) {
       return requests;
     }
-    const searchLower = searchTerm.toLowerCase().trim();
-    return requests.filter(request => {
-      // Recursive function to search through nested objects
-      const searchObject = (obj: any): boolean => {
-        if (!obj || typeof obj !== 'object') {
-          return false;
-        }
-        for (const key in obj) {
-          // FIX: Add hasOwnProperty check to filter prototype properties
-          if (Object.prototype.hasOwnProperty.call(obj, key)) {
-            const value = obj[key];
 
-            if (typeof value === 'string' && value.toLowerCase().includes(searchLower)) {
-              return true;
-            }
-
-            if (typeof value === 'object' && value !== null) {
-              if (searchObject(value)) {
-                return true;
-              }
-            }
-          }
-        }
-        return false;
-      };
-      return searchObject(request);
+    const lowerSearchTerm = searchTerm.toLowerCase();
+    
+    return requests.filter(req => {
+      const fileUrl = req.approvalDetails?.FileURL;
+      if (!fileUrl) return false;
+      
+    
+      const fileName = decodeURIComponent(fileUrl.split('/').pop() || '');
+      return fileName.toLowerCase().includes(lowerSearchTerm);
     });
   }, [requests, searchTerm]);
 
@@ -117,7 +114,7 @@ const L1ApproverDashboard = () => {
       {loading ? (
         <div style={{ width: '90%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>Loading...</div>
       ) : (
-        <Row gutter={[14, 14]} style={{ position: 'relative', left: '3%', width: '97%' }}>
+        <Row gutter={[16, 16]}>
           {filteredRequests.length > 0 ? (
             filteredRequests.map(req => (
               <Col
@@ -128,21 +125,16 @@ const L1ApproverDashboard = () => {
                 md={6}
                 lg={4}
               >
-                <ApprovalCard
+                <ApprovalCard 
                   request={req}
                   status={activeTab}
+                  onActionCompleted={loadRequests}
                 />
               </Col>
             ))
           ) : (
             <Col span={24}>
-              <Empty
-                description={
-                  searchTerm
-                    ? `No requests found for "${searchTerm}"`
-                    : "No requests found"
-                }
-              />
+              <Empty description={searchTerm ? "No requests match your search" : "No requests found"} />
             </Col>
           )}
         </Row>

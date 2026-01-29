@@ -14,12 +14,18 @@ const RequestCardMenu: React.FC<IRequestCardMenuProps> = ({
     onClose,
     onTrackProgressClick 
 }) => {
-    const handlePreviewClick = () => {
-        if (request.FolderURL) {
-            window.open(request.FolderURL, '_blank', 'noopener,noreferrer');
-        }
-        onClose();
-    }
+    const getBrowserUrl = (url: string) => {
+  if (!url) return '';
+  return url.includes('?') ? `${url}&web=1` : `${url}?web=1`;
+};
+
+const handlePreviewClick = () => {
+  if (request.FolderURL) {
+    const browserUrl = getBrowserUrl(request.FolderURL);
+    window.open(browserUrl, '_blank', 'noopener,noreferrer');
+  }
+  onClose();
+};
 
     const handleTrackProgressClick = () => {
         onClose();

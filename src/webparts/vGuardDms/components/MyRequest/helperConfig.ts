@@ -9,6 +9,7 @@ export interface IRequestItem {
     Created: string;  
     Modified?: string;
     approvalLevels?: any[];  
+    currentApprover?: string[];
 }
 
 
@@ -26,8 +27,10 @@ export interface ICreateRequestParams {
     folderURL: string;
     requesterName: string;
     requesterEmail: string;
-    renewalDate: Date;
     department: string;
+    renewalDate: Date | null;
+    Document_Type: string;
+    [key: string]: any;
 }
 
 export interface IApprovalAction {

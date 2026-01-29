@@ -434,6 +434,47 @@
   }
 }
 
+.dynamicField {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+
+  label {
+    font-size: 13px;
+    margin-bottom: 4px;
+    color: #605e5c;
+
+    span {
+      color: #d13438; // required *
+    }
+  }
+
+  input {
+    height: 34px;
+    padding: 6px 10px;
+    border: 1px solid #c8c6c4;
+    border-radius: 4px;
+    font-size: 14px;
+
+     &:hover {
+     border-color: #fa8c16;
+     background: #fffbf5;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: #fa8c16;
+      background-color: #fff; 
+    }
+  }
+}
+
+.inputGrid{
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
 
 
 
