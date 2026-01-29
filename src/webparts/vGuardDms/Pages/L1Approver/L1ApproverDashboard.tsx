@@ -67,7 +67,7 @@ const L1ApproverDashboard = () => {
       } finally {
         setLoading(false);
       }
-    };
+    }; 
 
    void loadRequests();
   }, [activeTab, currentUserEmail]); 
