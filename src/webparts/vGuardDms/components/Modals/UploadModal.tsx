@@ -43,7 +43,7 @@ const UploadModal: React.FC<IUploadModalProps> = ({
         
         setDocTypeChoices(field.Choices);
     }
-    loadChoices();
+   void loadChoices();
 },[]);
 
     React.useEffect(() => {
@@ -65,7 +65,7 @@ const UploadModal: React.FC<IUploadModalProps> = ({
                 setMetadataMap(map);
         };
 
-        loadMetadataFields();
+        void loadMetadataFields();
     },[]);
 
 
@@ -278,7 +278,7 @@ const UploadModal: React.FC<IUploadModalProps> = ({
                 throw new Error('Unable to get the user information');
             }
 
-            const folderPath = currentFolderPath || '/sites/Developsite/DMS';
+            const folderPath = currentFolderPath || '/sites/enterprisedocumenthub-test/DMS';
             console.log('Uploading to folder:', folderPath);
 
             const folder = sp.web.getFolderByServerRelativePath(folderPath);

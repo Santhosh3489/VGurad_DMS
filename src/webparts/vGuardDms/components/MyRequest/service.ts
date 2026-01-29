@@ -34,7 +34,7 @@ export const getApproversByLevel = async (level: 'L1_Approver' | 'L2_Approver' |
         const approvers = await sp.web.lists
             .getByTitle('User_Configuration')
             .items
-            .filter(`ApprovelLevel eq '${level}' and ApproverAccess eq 1`)
+            .filter(`ApprovalLevel eq '${level}' and Approver_Access eq 1`)
             .select('UserName', 'UserEmailId')();
 
         console.log("Approvers", approvers);
@@ -56,21 +56,21 @@ const createApprovalTrackingRecords = async (requestId: string, params: ICreateR
         const l1Approvers = await sp.web.lists
             .getByTitle('User_Configuration')
             .items
-            .filter(`ApprovelLevel eq 'L1_Approver' and ApproverAccess eq 1 and Department eq '${department}'`)
+            .filter(`ApprovalLevel eq 'L1_Approver' and Approver_Access eq 1 and Department eq '${department}'`)
             .select('UserName', 'UserEmailId')();
 
             // Get L2 approvers for this department
         const l2Approvers = await sp.web.lists
             .getByTitle('User_Configuration')
             .items
-            .filter(`ApprovelLevel eq 'L2_Approver' and ApproverAccess eq 1 and Department eq '${department}'`)
+            .filter(`ApprovalLevel eq 'L2_Approver' and Approver_Access eq 1 and Department eq '${department}'`)
             .select('UserName', 'UserEmailId')();
 
         // Get L3 approvers for this department
         const l3Approvers = await sp.web.lists
             .getByTitle('User_Configuration')
             .items
-            .filter(`ApprovelLevel eq 'L3_Approver' and ApproverAccess eq 1 and Department eq '${department}'`)
+            .filter(`ApprovalLevel eq 'L3_Approver' and Approver_Access eq 1 and Department eq '${department}'`)
             .select('UserName', 'UserEmailId')();
 
 

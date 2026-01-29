@@ -188,7 +188,7 @@ export const getApproverAccessMap = async (
 
     items.forEach(item => {
       const department = item.Department?.trim();
-      const approvalLevel = item.ApprovelLevel?.trim(); 
+      const approvalLevel = item.ApprovalLevel?.trim(); 
 
       if (!department || !approvalLevel) return;
 

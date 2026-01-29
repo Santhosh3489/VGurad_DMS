@@ -17,13 +17,15 @@ interface ApprovalCardDetailsProps {
   onClose: () => void;
   approvalDetails: any | null;
   status: 'pending' | 'approved' | 'rejected' | 'totalRequests';
+  onActionCompleted: () => void;
 }
 
 const ApprovalCardDetails: React.FC<ApprovalCardDetailsProps> = ({
   open,
   onClose,
   approvalDetails,
-  status
+  status,
+  onActionCompleted
 }) => {
   if (!approvalDetails) return null;
 
@@ -66,7 +68,7 @@ const ApprovalCardDetails: React.FC<ApprovalCardDetailsProps> = ({
   }, [approvalDetails]);
 
   
-  React.useEffect(() => {
+  React.useEffect(() => { 
     const loadSize = async () => {
       try {
         const sp = getSP();
@@ -94,6 +96,7 @@ const ApprovalCardDetails: React.FC<ApprovalCardDetailsProps> = ({
       action: 'Approve',
       comments: 'Approved'
     });
+    onActionCompleted();
 
   };
 

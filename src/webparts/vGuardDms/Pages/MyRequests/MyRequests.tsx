@@ -27,7 +27,10 @@ const MyRequests: React.FC = () => {
 
 
   React.useEffect(() => {
-    const fetchData = async () => {
+    void fetchData();
+  }, []);
+
+   const fetchData = async () => {
       try {
         setLoading(true);
         const user = await getCurrentUser();
@@ -42,11 +45,6 @@ const MyRequests: React.FC = () => {
         setLoading(false);
       }
     }
-
-    void fetchData();
-  }, []);
-
-
 
   const handleViewReasonClick = (request: IRequestItem) => {
   
@@ -187,9 +185,10 @@ const MyRequests: React.FC = () => {
 
       <ViewReason
            isOpen={showViewReason}
-           onClose={() => {
+           onClose={async () => {
                 setShowViewReason(false);
                  setViewReasonData(null);
+                  await fetchData();
            }}
            reasonData={viewReasonData}
       />
@@ -198,9 +197,10 @@ const MyRequests: React.FC = () => {
       {selectedRequest && (
         <TrackProgressModal
           isOpen={showTrackProgress}
-          onClose={() => {
+          onClose={async () => {
             setShowTrackProgress(false);
             setSelectedRequest(null);
+            await fetchData();
           }}
           request={selectedRequest}
         />

@@ -21,7 +21,10 @@ const L1ApproverDashboard = () => {
   const [currentUserEmail, setCurrentUserEmail] = useState<string>('');
   
   useEffect(() => {
-    const fetchUserEmail = async () => {
+    void fetchUserEmail();
+  }, []); 
+
+   const fetchUserEmail = async () => {
       try {
         const user = await getCurrentUser();
         const email = user.mail || user.userPrincipalName;
@@ -32,11 +35,13 @@ const L1ApproverDashboard = () => {
       }
     };
 
-    void fetchUserEmail();
-  }, []); 
 
   useEffect(() => {
-    const loadRequests = async () => {
+   void loadRequests();
+  }, [activeTab, currentUserEmail]); 
+
+
+      const loadRequests = async () => {
       if (!currentUserEmail) {
         console.log('Waiting for user email...');
         return;
@@ -68,9 +73,6 @@ const L1ApproverDashboard = () => {
         setLoading(false);
       }
     }; 
-
-   void loadRequests();
-  }, [activeTab, currentUserEmail]); 
 
   const filteredRequests = useMemo(() => {
     if (!searchTerm.trim()) {
@@ -125,6 +127,7 @@ const L1ApproverDashboard = () => {
                 <ApprovalCard 
                   request={req}
                   status={activeTab}
+                  onActionCompleted={loadRequests}
                 />
               </Col>
             ))

@@ -10,9 +10,10 @@ import { getUserProfilePhoto } from '../../../../Service/commonService';
 interface ApprovalCardProps {
   request: any;
   status: 'pending' | 'approved' | 'rejected' | 'totalRequests';
+  onActionCompleted: () => void;
 }
 
-const ApprovalCard: React.FC<ApprovalCardProps> = ({ request, status }) => {
+const ApprovalCard: React.FC<ApprovalCardProps> = ({ request, status, onActionCompleted }) => {
   const { approvalDetails } = request;
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -169,6 +170,7 @@ const ApprovalCard: React.FC<ApprovalCardProps> = ({ request, status }) => {
         onClose={closeDrawer}
         approvalDetails={approvalDetails}
         status={status}
+        onActionCompleted={onActionCompleted} 
       />
     </>
   );

@@ -19,8 +19,8 @@ const DocsLibrary: React.FC<IDocsLibraryProps> = ({
     onAddNew
 }, ref) => {
     const _sp: SPFI = getSP();
-    const initialPath = `/sites/Developsite/${LibraryConstants.DOCUMENT_LIBRARY.DMS_Library}`;
-    const siteRoot = '/sites/Developsite';
+    const initialPath = `/sites/enterprisedocumenthub-test/${LibraryConstants.DOCUMENT_LIBRARY.DMS_Library}`;
+    const siteRoot = '/sites/enterprisedocumenthub-test';
 
     const [loading, setLoading] = React.useState<boolean>(true);
     const [error, setError] = React.useState<string>('');
@@ -62,33 +62,34 @@ const DocsLibrary: React.FC<IDocsLibraryProps> = ({
         }
     }, [onAddNew]);
 
-    const buildBreadcrumbs = React.useCallback((path: string): IBreadcrumbItem[] => {
-        const libraryRoot = `${siteRoot}/${LibraryConstants.DOCUMENT_LIBRARY.DMS_Library}`;
+ const buildBreadcrumbs = React.useCallback((path: string): IBreadcrumbItem[] => {
+    const libraryRoot = `${siteRoot}/${LibraryConstants.DOCUMENT_LIBRARY.DMS_Library}`;
 
-        if (path === libraryRoot) {
-            return [];
-        }
+    // Compare paths case-insensitively
+    const pathLower = path.toLowerCase();
+    const libraryRootLower = libraryRoot.toLowerCase();
 
-        const relativePath = path.replace(libraryRoot, '').replace(/^\/+|\/+$/g, '');
+    if (pathLower === libraryRootLower) return [];
 
-        if (!relativePath) {
-            return [];
-        }
+    const relativePath = path.substring(libraryRoot.length).replace(/^\/+|\/+$/g, '');
 
-        const parts = relativePath.split('/').filter(part => part.trim() !== '');
-        const breadcrumbItems: IBreadcrumbItem[] = [];
-        let accumulatedPath = libraryRoot;
+    if (!relativePath) return [];
 
-        for (let i = 0; i < parts.length; i++) {
-            accumulatedPath += `/${parts[i]}`;
-            breadcrumbItems.push({
-                name: decodeURIComponent(parts[i]),
-                path: accumulatedPath
-            });
-        }
+    const parts = relativePath.split('/').filter(part => part.trim() !== '');
+    const breadcrumbItems: IBreadcrumbItem[] = [];
+    let accumulatedPath = libraryRoot;
 
-        return breadcrumbItems;
-    }, [siteRoot]);
+    for (let i = 0; i < parts.length; i++) {
+        accumulatedPath += `/${parts[i]}`;
+        breadcrumbItems.push({
+            name: decodeURIComponent(parts[i]),
+            path: accumulatedPath
+        });
+    }
+
+    console.log("Breadcrumbs built for path:", path, breadcrumbItems);
+    return breadcrumbItems;
+}, [siteRoot]);
 
     const loadFolder = React.useCallback(async (folderPath: string, forceRefresh: boolean = false, searchTerm?: string): Promise<void> => {
         try {
