@@ -235,12 +235,26 @@ const DocsLibrary: React.FC<IDocsLibraryProps> = ({
         };
     }, []);
 
+    // React.useEffect(() => {
+    //     loadFolder(initialPath).catch((err) => {
+    //         console.error('Failed to load initial folder:', err);
+    //         setError('Failed to load initial folder');
+    //     });
+    // }, [loadFolder, initialPath]);
+
     React.useEffect(() => {
-        loadFolder(initialPath).catch((err) => {
-            console.error('Failed to load initial folder:', err);
-            setError('Failed to load initial folder');
-        });
-    }, [loadFolder, initialPath]);
+        const loadData = async () => {
+            try {
+                await loadFolder(initialPath);
+            } catch (err) {
+                console.error('Failed to load initial folder:', err);
+                setError('Failed to load initial folder');
+            }
+        };
+
+        void loadData();
+    }, [loadFolder, initialPath]); // Make sure to include dependencies
+
     // Initial load - only on mount
     React.useEffect(() => {
         // Create a wrapper function that doesn't depend on loadFolder
@@ -269,12 +283,8 @@ const DocsLibrary: React.FC<IDocsLibraryProps> = ({
             }
         };
 
-        loadInitialData();
-    }, []);
-
-    React.useEffect(() => {
-        console.log('Current path updated:', currentPath);
-    }, [currentPath]);
+        void loadInitialData();
+    }, []); // Empty dependency array since this should only run once on mount
 
     // Update filtered files to use search results when searching
     const filteredFiles = React.useMemo(() => {

@@ -99,7 +99,7 @@ export const approveDocument = async ({
 
       if (!nextLevel) {
         newMainStatus = 'Completed';
-        newLevelStatus = 'All Approved';
+        newLevelStatus = 'Completed';
       }
     } else {
 

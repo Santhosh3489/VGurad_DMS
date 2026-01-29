@@ -205,21 +205,21 @@ const UploadModal: React.FC<IUploadModalProps> = ({
             hidden={!isOpen}
             onDismiss={handleClose}
             dialogContentProps={dialogContentProps}
-              modalProps={{
-        isBlocking: uploading,
-        styles: {
-            main: {
-                maxWidth: 500,
-            },
-        },
-        layerProps: {
-            styles: {
-                root: {
-                    zIndex: 1002  // Higher than drawer's z-index
+            modalProps={{
+                isBlocking: uploading,
+                styles: {
+                    main: {
+                        maxWidth: 500,
+                    },
+                },
+                layerProps: {
+                    styles: {
+                        root: {
+                            zIndex: 1002  // Higher than drawer's z-index
+                        }
+                    }
                 }
-            }
-        }
-    }}
+            }}
             styles={{
                 main: {
                     minWidth: '75%',
@@ -283,31 +283,33 @@ const UploadModal: React.FC<IUploadModalProps> = ({
                 )}
 
                 <div className={styles.renewalDateSection}>
+                    <div className={styles.fieldContainer}>
+                    <label className={styles.dateLabel} style={{ marginLeft: '20px' }}>Department <span style={{ color: "red" }}>*</span></label>
+                    <select
+                        className={styles.departmentDropdown}
+                        value={department}
+                        onChange={(e) => setDepartment(e.target.value)}
+                        disabled={uploading}
+                        style={{
+                            color: department === "" ? "#333" : "#000",
+                            fontWeight: "normal"
+                        }}
+                    >
+                        <option value="" disabled hidden>Select Department </option>
+                        {departments.map((dept) => (
+                            <option key={dept} value={dept}>{dept}</option>
+                        ))}
+                    </select></div>
+
+                    <div className={styles.fieldContainer}>
                     <label className={styles.dateLabel}>Renewal Date</label>
-                     <input
+                    <input
                         type="date"
                         className={styles.dateInput}
                         value={renewalDate}
                         onChange={(e) => setRenewalDate(e.target.value)}
                         disabled={uploading}
-                     />
-
-                     <label className={styles.dateLabel} style={{marginLeft: '20px'}}>Department <span style={{color : "red"}}>*</span></label>
-                     <select
-                       className={styles.departmentDropdown}
-                       value={department}
-                       onChange={(e) => setDepartment(e.target.value)}
-                       disabled={uploading}
-                       style={{
-                          color: department === "" ? "#333" : "#000",
-                          fontWeight: "normal"
-                        }}
-                     >
-                          <option value=""  disabled hidden>Select Department </option>
-                          {departments.map((dept) => (
-                            <option key={dept} value={dept}>{dept}</option>
-                          ))}
-                     </select>
+                    /></div>
                 </div>
 
                 {uploadStatus === 'success' && (

@@ -12,6 +12,18 @@ import ApprovalConfirmModal from '../Modals/ApproverConfirmModal';
 import { approveDocument } from './service';
 import RejectCommentModal from '../Modals/RejectCommentModal';
 
+const css = `
+.ant-drawer-body {
+padding-top: 0;
+    padding-bottom: 10px;
+}
+    .ant-drawer-content {
+    position: relative !important;
+    top: 7% !important;
+    height: 93% !important;
+    }
+`;
+
 interface ApprovalCardDetailsProps {
   open: boolean;
   onClose: () => void;
@@ -40,15 +52,24 @@ const ApprovalCardDetails: React.FC<ApprovalCardDetailsProps> = ({
     ? decodeURIComponent(fileUrl.split('/').pop() || '')
     : '';
 
-  
+  // FIX 1: Line 54 - getUserProfilePhoto
   React.useEffect(() => {
     if (!approvalDetails?.Requester_MailId) return;
 
-    getUserProfilePhoto(approvalDetails.Requester_MailId)
-      .then(setPhotoUrl);
+    const fetchPhoto = async () => {
+      try {
+        const url = await getUserProfilePhoto(approvalDetails.Requester_MailId);
+        setPhotoUrl(url);
+      } catch (error) {
+        console.error('Failed to load profile photo:', error);
+        setPhotoUrl(null);
+      }
+    };
+
+    void fetchPhoto();
   }, [approvalDetails]);
 
-  
+  // FIX 2: Line 78 - loadRequestDetails
   React.useEffect(() => {
     if (!approvalDetails?.Requester_MailId) return;
 
@@ -68,10 +89,10 @@ const ApprovalCardDetails: React.FC<ApprovalCardDetailsProps> = ({
       }
     };
 
-    loadRequestDetails();
+    void loadRequestDetails();
   }, [approvalDetails]);
 
- 
+  // FIX 3: Line 97 - loadFileSize
   React.useEffect(() => {
     const loadFileSize = async () => {
       if (!approvalDetails?.FileURL) return;
@@ -87,49 +108,55 @@ const ApprovalCardDetails: React.FC<ApprovalCardDetailsProps> = ({
       }
     };
 
-    loadFileSize();
+    void loadFileSize();
   }, [approvalDetails]);
 
-
-
-
-  
-  const handleApproveConfirm = async () => {  
-    
+  const handleApproveConfirm = async () => {
     if (!approvalDetails) return;
 
     await approveDocument({
-    requestId: approvalDetails.RequestId,
-    approverName: approvalDetails.Assigned_UserName,
-    approverEmail: approvalDetails.Assigned_MailId,
-    approvalLevel: approvalDetails.Req_Level.replace(' Approval', '') as 'L1' | 'L2' | 'L3',
-    action: 'Approve',
-    comments: 'Approval completed'
-  });
+      requestId: approvalDetails.RequestId,
+      approverName: approvalDetails.Assigned_UserName,
+      approverEmail: approvalDetails.Assigned_MailId,
+      approvalLevel: approvalDetails.Req_Level.replace(' Approval', '') as 'L1' | 'L2' | 'L3',
+      action: 'Approve',
+      comments: 'Approval completed'
+    });
 
- // setOpenApproveModal(false); 
-  //onClose();
-}
+    // setOpenApproveModal(false); 
+    // onClose();
+  };
 
+  const handleRejectSubmit = async (reason: string) => {
+    await approveDocument({
+      requestId: approvalDetails.RequestId,
+      approverName: approvalDetails.Assigned_UserName,
+      approverEmail: approvalDetails.Assigned_MailId,
+      approvalLevel: approvalDetails.Req_Level.replace(' Approval', '') as 'L1' | 'L2' | 'L3',
+      action: 'Reject',
+      comments: reason
+    });
 
-const handleRejectSubmit = async (reason: string) => {
-  await approveDocument({
-    requestId: approvalDetails.RequestId,
-    approverName: approvalDetails.Assigned_UserName,
-    approverEmail: approvalDetails.Assigned_MailId,
-    approvalLevel: approvalDetails.Req_Level.replace(' Approval', '') as 'L1' | 'L2' | 'L3',
-    action: 'Reject',
-    comments: reason
-  });
-
-  setOpenRejectModal(false);
-  onClose(); 
-};
-
-
+    setOpenRejectModal(false);
+    onClose();
+  };
 
   const requestedDate = DateFormatter.formatDate(approvalDetails?.Created);
 
+  const openFileInBrowser = (url: string) => {
+    if (!url) return;
+    const officeExtensions = ['.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx'];
+
+    const lowerUrl = url.toLowerCase();
+    const isOfficeFile = officeExtensions.some(ext => lowerUrl.endsWith(ext));
+
+    let finalUrl = url;
+    if (isOfficeFile && !lowerUrl.includes('web=1')) {
+      finalUrl = url.includes('?') ? `${url}&web=1` : `${url}?web=1`;
+    }
+
+    window.open(finalUrl, '_blank');
+  };
 
   return (
     <Drawer
@@ -141,15 +168,15 @@ const handleRejectSubmit = async (reason: string) => {
       footer={
         <div className={styles.footerActions}>
           <button className={styles.rejectBtn}
-          onClick={() => setOpenRejectModal(true)}
+            onClick={() => setOpenRejectModal(true)}
           >
             Reject
           </button>
 
           <RejectCommentModal
-              open={openRejectModal}
-               onSubmit={handleRejectSubmit}
-               onCancel={() => setOpenRejectModal(false)}
+            open={openRejectModal}
+            onSubmit={handleRejectSubmit}
+            onCancel={() => setOpenRejectModal(false)}
           />
 
           <button
@@ -167,30 +194,31 @@ const handleRejectSubmit = async (reason: string) => {
         </div>
       }
     >
+      <style>{css}</style>
       <div className={styles.toprow}>
-           <button onClick={openTrackProgressModal} className={styles.viewStatus}>
-               View Status
-            </button> 
-           {requestDetails && (
-                  <TrackProgressModal
-                  isOpen={openModal}
-                  onClose={closeTrackProgressModal}
-                  request={requestDetails}
-                   />
-            )}
-        </div>
+        <button onClick={openTrackProgressModal} className={styles.viewStatus}>
+          View Status
+        </button>
+        {requestDetails && (
+          <TrackProgressModal
+            isOpen={openModal}
+            onClose={closeTrackProgressModal}
+            request={requestDetails}
+          />
+        )}
+      </div>
 
-        <div className={styles.requesterDetails}>
+      <div className={styles.requesterDetails}>
         <div className={styles.left}>
-           <img
-           className={styles.avatar}
-           src={photoUrl ?? 'https://static.vecteezy.com/system/resources/previews/026/619/142/original/default-avatar-profile-icon-of-social-media-user-photo-image-vector.jpg'}
-           alt="profile"
-           />
-        <div >
-             <p className={styles.label}>Requested by</p>
-             <p className={styles.value}>{requestDetails?.Requester_Name || '-'}</p>
-        </div>
+          <img
+            className={styles.avatar}
+            src={photoUrl ?? 'https://static.vecteezy.com/system/resources/previews/026/619/142/original/default-avatar-profile-icon-of-social-media-user-photo-image-vector.jpg'}
+            alt="profile"
+          />
+          <div >
+            <p className={styles.label}>Requested by</p>
+            <p className={styles.value}>{requestDetails?.Requester_Name || '-'}</p>
+          </div>
         </div>
 
         <div className={styles.divider}></div>
@@ -199,32 +227,31 @@ const handleRejectSubmit = async (reason: string) => {
           <p className={styles.label}>Requested on</p>
           <p className={styles.value}>{requestedDate}</p>
         </div>
-    </div>
+      </div>
 
 
-   <div
-    className={styles.fileCard}
-    onClick={() => window.open(fileUrl, '_blank')}
-   >
-    <div className={styles.left}>
-    <div className={styles.wordIcon}>
-      <FileWordOutlined />
-    </div>
+      <div className={styles.fileCard}>
+        <div className={styles.fileCardlayout}>
+        <div className={styles.left}>
+          <div className={styles.wordIcon}>
+            <FileWordOutlined />
+          </div>
 
-    <div>
-      <p className={styles.fileName}>{fileName}</p>
-      <p className={styles.fileSize}>{fileSizeKB} KB</p>
-    </div>
-    </div>
+          <div>
+            <p className={styles.fileName}>{fileName}</p>
+            <p className={styles.fileSize}>{fileSizeKB} KB</p>
+          </div>
+        </div>
 
-    <EyeOutlined className={styles.viewIcon} />
-    </div>
+        <EyeOutlined
+          className={styles.viewIcon}
+          onClick={() => openFileInBrowser(fileUrl)}
+        />
+        </div>
+      </div>
 
     </Drawer>
   );
 };
 
-
-
 export default ApprovalCardDetails;
-

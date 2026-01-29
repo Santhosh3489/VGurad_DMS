@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import ApprovalCard from '../../components/Approvers/ApprovalCard';
 import styles from './L1ApproverDashboard.module.scss';
 import Header from '../../components/Helper/Header';
@@ -10,16 +10,14 @@ import { getCurrentUser } from '../../../../Service/commonService';
 import { Search } from 'lucide-react';
 import { Col, Empty, Row } from 'antd/es';
 
-
 const L1ApproverDashboard = () => {
   const [requests, setRequests] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<'pending' | 'approved'>('pending');
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentUserEmail, setCurrentUserEmail] = useState<string>('');
-  
 
-  
+  // FIX 1: Line 32 - Wrap fetchUserEmail in async function with void operator
   useEffect(() => {
     const fetchUserEmail = async () => {
       try {
@@ -32,12 +30,12 @@ const L1ApproverDashboard = () => {
       }
     };
 
-    fetchUserEmail();
-  }, []); 
+    void fetchUserEmail();
+  }, []);
 
+  // FIX 2: Line 59 - Wrap loadRequests in async function with void operator
   useEffect(() => {
     const loadRequests = async () => {
-     
       if (!currentUserEmail) {
         console.log('Waiting for user email...');
         return;
@@ -57,10 +55,44 @@ const L1ApproverDashboard = () => {
       } finally {
         setLoading(false);
       }
-    }; 
+    };
 
-    loadRequests();
-  }, [activeTab, currentUserEmail]); 
+    void loadRequests();
+  }, [activeTab, currentUserEmail]);
+
+  // FIX 3: Line 75 - Add hasOwnProperty check for guard-for-in rule
+  const filteredRequests = useMemo(() => {
+    if (!searchTerm.trim()) {
+      return requests;
+    }
+    const searchLower = searchTerm.toLowerCase().trim();
+    return requests.filter(request => {
+      // Recursive function to search through nested objects
+      const searchObject = (obj: any): boolean => {
+        if (!obj || typeof obj !== 'object') {
+          return false;
+        }
+        for (const key in obj) {
+          // FIX: Add hasOwnProperty check to filter prototype properties
+          if (Object.prototype.hasOwnProperty.call(obj, key)) {
+            const value = obj[key];
+
+            if (typeof value === 'string' && value.toLowerCase().includes(searchLower)) {
+              return true;
+            }
+
+            if (typeof value === 'object' && value !== null) {
+              if (searchObject(value)) {
+                return true;
+              }
+            }
+          }
+        }
+        return false;
+      };
+      return searchObject(request);
+    });
+  }, [requests, searchTerm]);
 
   return (
     <div className={styles.container}>
@@ -83,27 +115,34 @@ const L1ApproverDashboard = () => {
       </div>
 
       {loading ? (
-        <div>Loading...</div>
+        <div style={{ width: '90%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>Loading...</div>
       ) : (
-        <Row gutter={[16, 16]}>
-          {requests.length > 0 ? (
-            requests.map(req => (
+        <Row gutter={[14, 14]} style={{ position: 'relative', left: '3%', width: '97%' }}>
+          {filteredRequests.length > 0 ? (
+            filteredRequests.map(req => (
               <Col
+                style={{ minWidth: '318px', maxWidth: '320px' }}
                 key={req.RequestId}
-                xs={24}
-                sm={12}
-                md={8}
-                lg={6}
+                xs={22}
+                sm={10}
+                md={6}
+                lg={4}
               >
-                <ApprovalCard 
-                request={req}
-                status={activeTab}
-                 />
+                <ApprovalCard
+                  request={req}
+                  status={activeTab}
+                />
               </Col>
             ))
           ) : (
             <Col span={24}>
-              <Empty description="No requests found" />
+              <Empty
+                description={
+                  searchTerm
+                    ? `No requests found for "${searchTerm}"`
+                    : "No requests found"
+                }
+              />
             </Col>
           )}
         </Row>
