@@ -244,8 +244,14 @@ export class DocsLibraryService {
      */
     async uploadFile(folderPath: string, fileName: string, content: Blob | ArrayBuffer): Promise<IFileInfo> {
         try {
+             const exists = await this.fileExistsInFolder(folderPath, fileName);
+             if (exists) {
+            throw new Error(
+                `File "${fileName}" already exists in this folder! So try with other names`
+            );
+        }
             const folder = this._sp.web.getFolderByServerRelativePath(folderPath);
-            const uploadedFile = await folder.files.addUsingPath(fileName, content, { Overwrite: true });
+            const uploadedFile = await folder.files.addUsingPath(fileName, content, { Overwrite: false });
             return uploadedFile;
         } catch (error: any) {
             console.error('Error uploading file:', error);
@@ -316,6 +322,25 @@ export class DocsLibraryService {
             throw new Error(`Failed to rename folder: ${error.message}`);
         }
     }
+
+async fileExistsInFolder(
+    folderPath: string,
+    fileName: string
+): Promise<boolean> {
+    try {
+        const folder = this._sp.web.getFolderByServerRelativePath(folderPath);
+
+        const files = await folder.files
+            .select('Name')();
+
+        return files.some(
+            f => f.Name.toLowerCase() === fileName.toLowerCase()
+        );
+    } catch (error) {
+        console.error('Error checking file existence:', error);
+        return false;
+    }
+}
 }
 
 // Factory function to create service instance

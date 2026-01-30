@@ -1,3 +1,4 @@
+import { IDatePickerStrings } from "@fluentui/react";
 import moment from "moment";
 export class DateFormatter {
     public static formatDate(dateString: string, format: string = 'MMM DD, YYYY'): string {
@@ -32,6 +33,19 @@ export class DateFormatter {
   }
 
 }
+
+
+export const datePickerStrings: IDatePickerStrings = {
+  months: [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ],
+  shortMonths: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+  days: ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],
+  shortDays: ['S','M','T','W','T','F','S'],
+  goToToday: 'Go to today',
+};
+
 
 
 //•

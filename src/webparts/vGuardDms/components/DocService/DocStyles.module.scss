@@ -400,3 +400,39 @@
         font-style: italic;
     }
 }
+
+.listfileCell {
+  padding: 12px 16px;
+  vertical-align: middle;
+}
+
+.listfileWrapper {
+  display: flex;
+  align-items: center;   // ⭐ centers icon & text
+  gap: 12px;
+}
+
+.listfileIcon {
+  display: flex;         // ⭐ VERY IMPORTANT
+  align-items: center;
+  justify-content: center;
+
+  width: 36px;           // lock icon box size
+  height: 36px;
+  flex-shrink: 0;
+}
+
+.listfileIcon img,
+.listfileIcon svg {
+  width: 100%;           // force icon to fit box
+  height: 100%;
+  object-fit: contain;
+
+  // 🚫 prevent floating
+  position: static;
+}
+
+.listfileName {
+  font-size: 14px;
+  line-height: 1.4;
+}

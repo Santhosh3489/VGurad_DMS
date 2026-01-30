@@ -9,6 +9,7 @@ import Breadcrumbs, { IBreadcrumbItem } from '../Helper/Breadcrumbs';
 import Header from '../Helper/Header';
 import { List, Grid2X2, Search, X } from 'lucide-react';
 import { DocsLibraryService } from './DocsService';
+import { FileHelper } from '../utils/FileHelper';
 
 const DocsLibrary: React.FC<IDocsLibraryProps> = ({
     currentView,
@@ -525,7 +526,16 @@ const DocsLibrary: React.FC<IDocsLibraryProps> = ({
                                                 onClick={() => handleFileClick(file)}
                                                 className={styles.tableRow}
                                             >
-                                                <td>📄 {file.Name}</td>
+                                                <td className={styles.listfileCell}>
+                                                    <div className={styles.listfileWrapper}>
+                                                    <span className={styles.listfileIcon}>
+                                                        {FileHelper.getFileIcon(file.Name)}
+                                                    </span>
+                                                    <span className={styles.listfileName}>
+                                                        {file.Name}
+                                                    </span>
+                                                     </div>
+                                                </td>
                                                 <td>{new Date(file.TimeLastModified).toLocaleDateString()}</td>
                                                 <td>{(parseInt(file.Length) / 1024).toFixed(2)} KB</td>
                                             </tr>
