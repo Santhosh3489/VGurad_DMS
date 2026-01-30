@@ -376,11 +376,22 @@
 }
 
 .renewalDateSection {
-  margin: 16px 35px;
+  // margin: 16px 35px;
+      width: 100%;
+    display: flex;
+    gap: 10px;
+}
+
+.fieldContainer {
+  width: 49%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 3px;
 }
 
 .dateInput {
-  width: 25%;
+  width: 65%;
   padding: 10px 12px;
   font-size: 14px;
   border: 1px solid #d1d1d1;
@@ -402,7 +413,7 @@
 }
 
 .departmentDropdown {
-  width: 30%;
+  width: 65%;
   padding: 10px 12px;
   font-size: 14px;
   border: 1px solid #d1d1d1;

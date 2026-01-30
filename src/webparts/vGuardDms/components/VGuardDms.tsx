@@ -77,7 +77,7 @@ const VGuardDms = (props: IVGuardDmsProps) => {
         className={styles.bgContainer} 
       />
       {(!graphInitialized || loading) ? (
-        <div style={{ width: '100%', height: '80vh' }}>
+        <div style={{ width: '100%', height: '80vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <p>Loading...</p>
         </div>
       ) : (

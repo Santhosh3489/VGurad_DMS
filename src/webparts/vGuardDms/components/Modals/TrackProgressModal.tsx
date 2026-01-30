@@ -21,12 +21,15 @@ export const TrackProgressModal: React.FC<ITrackProgressModalProps> = ({
   const [timeline, setTimeline] = React.useState<IApprovalLevel[]>([]);
   const [loading, setLoading] = React.useState<boolean>(true);
 
-  React.useEffect(() => {
+React.useEffect(() => {
+  const fetchData = async () => {
     if (isOpen && request) {
      void fetchApprovalData();
     }
-  }, [isOpen, request]);
+  };
 
+  void fetchData();
+}, [isOpen, request]);
 
   const toLevelStatusType = (status: string): LevelStatusType => {
     if (!status) return 'notreached';

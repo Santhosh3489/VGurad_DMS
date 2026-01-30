@@ -12,6 +12,18 @@ import ApprovalConfirmModal from '../Modals/ApproverConfirmModal';
 import { approveDocument } from './service';
 import RejectCommentModal from '../Modals/RejectCommentModal';
 
+const css = `
+.ant-drawer-body {
+padding-top: 0;
+    padding-bottom: 10px;
+}
+    .ant-drawer-content {
+    position: relative !important;
+    top: 7% !important;
+    height: 93% !important;
+    }
+`;
+
 interface ApprovalCardDetailsProps {
   open: boolean;
   onClose: () => void;
@@ -47,7 +59,7 @@ const ApprovalCardDetails: React.FC<ApprovalCardDetailsProps> = ({
    void getUserProfilePhoto(approvalDetails.Requester_MailId).then(setPhotoUrl);
   }, [approvalDetails]);
 
- 
+  // FIX 3: Line 97 - loadFileSize
   React.useEffect(() => {
     if (!approvalDetails?.Requester_MailId) return;
 

@@ -108,7 +108,7 @@ const ApprovalCard: React.FC<ApprovalCardProps> = ({ request, status, onActionCo
                   }
                   alt="profile"
                 />
-                <span className={styles.Approvedname}>
+                <span className={styles.name}>
                   {approvalDetails?.Requester_Name || '-'}
                 </span>
               </div>

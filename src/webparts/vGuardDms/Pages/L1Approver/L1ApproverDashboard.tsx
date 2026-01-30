@@ -12,7 +12,6 @@ import { getCurrentUser } from '../../../../Service/commonService';
 import { Search } from 'lucide-react';
 import { Col, Empty, Row } from 'antd/es';
 
-
 const L1ApproverDashboard = () => {
   const [requests, setRequests] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<'pending' | 'approved' | 'rejected' | 'totalRequests'>('pending');
@@ -36,6 +35,7 @@ const L1ApproverDashboard = () => {
     };
 
 
+  // FIX 2: Line 59 - Wrap loadRequests in async function with void operator
   useEffect(() => {
    void loadRequests();
   }, [activeTab, currentUserEmail]); 
@@ -72,7 +72,7 @@ const L1ApproverDashboard = () => {
       } finally {
         setLoading(false);
       }
-    }; 
+    };
 
   const filteredRequests = useMemo(() => {
     if (!searchTerm.trim()) {
@@ -112,17 +112,18 @@ const L1ApproverDashboard = () => {
       </div>
 
       {loading ? (
-        <div>Loading...</div>
+        <div style={{ width: '90%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>Loading...</div>
       ) : (
         <Row gutter={[16, 16]}>
           {filteredRequests.length > 0 ? (
             filteredRequests.map(req => (
               <Col
+                style={{ minWidth: '318px', maxWidth: '320px' }}
                 key={req.RequestId}
-                xs={24}
-                sm={12}
-                md={8}
-                lg={6}
+                xs={22}
+                sm={10}
+                md={6}
+                lg={4}
               >
                 <ApprovalCard 
                   request={req}

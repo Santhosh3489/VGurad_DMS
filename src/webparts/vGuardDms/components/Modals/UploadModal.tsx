@@ -364,21 +364,21 @@ const UploadModal: React.FC<IUploadModalProps> = ({
             hidden={!isOpen}
             onDismiss={handleClose}
             dialogContentProps={dialogContentProps}
-              modalProps={{
-        isBlocking: uploading,
-        styles: {
-            main: {
-                maxWidth: 500,
-            },
-        },
-        layerProps: {
-            styles: {
-                root: {
-                    zIndex: 1002  // Higher than drawer's z-index
+            modalProps={{
+                isBlocking: uploading,
+                styles: {
+                    main: {
+                        maxWidth: 500,
+                    },
+                },
+                layerProps: {
+                    styles: {
+                        root: {
+                            zIndex: 1002  // Higher than drawer's z-index
+                        }
+                    }
                 }
-            }
-        }
-    }}
+            }}
             styles={{
                 main: {
                     minWidth: '75%',
