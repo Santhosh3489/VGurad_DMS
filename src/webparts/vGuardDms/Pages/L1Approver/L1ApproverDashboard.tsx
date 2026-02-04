@@ -19,60 +19,91 @@ const L1ApproverDashboard = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentUserEmail, setCurrentUserEmail] = useState<string>('');
   
+  // State to store counts for each tab
+  const [tabCounts, setTabCounts] = useState({
+    pending: 0,
+    approved: 0,
+    rejected: 0,
+    totalRequests: 0
+  });
+  
   useEffect(() => {
     void fetchUserEmail();
   }, []); 
 
-   const fetchUserEmail = async () => {
-      try {
-        const user = await getCurrentUser();
-        const email = user.mail || user.userPrincipalName;
-        setCurrentUserEmail(email);
-        console.log('Logged in user email:', email);
-      } catch (error) {
-        console.error('Failed to get current user:', error);
-      }
-    };
+  const fetchUserEmail = async () => {
+    try {
+      const user = await getCurrentUser();
+      const email = user.mail || user.userPrincipalName;
+      setCurrentUserEmail(email);
+      console.log('Logged in user email:', email);
+    } catch (error) {
+      console.error('Failed to get current user:', error);
+    }
+  };
 
+  // Fetch data for all tabs to get counts
+  const fetchAllTabCounts = async (email: string) => {
+    if (!email) return;
+    
+    try {
+      const [pendingData, approvedData, rejectedData, allData] = await Promise.all([
+        getPendingRequestsForApprover(email),
+        getApprovedRequestsForApprover(email),
+        getRejectedRequestsForApprover(email),
+        getAllRequestsForApprover(email)
+      ]);
+      
+      setTabCounts({
+        pending: pendingData.length,
+        approved: approvedData.length,
+        rejected: rejectedData.length,
+        totalRequests: allData.length
+      });
+      
+    } catch (error) {
+      console.error('Error fetching tab counts:', error);
+    }
+  };
 
-  // FIX 2: Line 59 - Wrap loadRequests in async function with void operator
   useEffect(() => {
-   void loadRequests();
+    if (currentUserEmail) {
+      void loadRequests();
+      void fetchAllTabCounts(currentUserEmail);
+    }
   }, [activeTab, currentUserEmail]); 
 
+  const loadRequests = async () => {
+    if (!currentUserEmail) {
+      console.log('Waiting for user email...');
+      return;
+    }
 
-      const loadRequests = async () => {
-      if (!currentUserEmail) {
-        console.log('Waiting for user email...');
-        return;
+    try {
+      setLoading(true);
+      let data: any[] = []; 
+
+      if(activeTab === "pending"){ 
+        data = await getPendingRequestsForApprover(currentUserEmail);
+      }
+      else if (activeTab === "approved") {
+        data = await getApprovedRequestsForApprover(currentUserEmail);
+      }
+      else if (activeTab === "rejected"){
+        data = await getRejectedRequestsForApprover(currentUserEmail);
+      }
+      else{
+        data = await getAllRequestsForApprover(currentUserEmail);
       }
 
-      try {
-        setLoading(true);
-
-         let data: any[] = []; 
-
-            if(activeTab === "pending"){ 
-              data = await getPendingRequestsForApprover(currentUserEmail);
-            }
-            else if (activeTab === "approved") {
-              data =  await getApprovedRequestsForApprover(currentUserEmail);
-            }
-            else if (activeTab === "rejected"){
-               data = await getRejectedRequestsForApprover(currentUserEmail);
-            }
-            else{
-               data = await getAllRequestsForApprover(currentUserEmail);
-            }
-
-        console.log("Loading data for:", currentUserEmail, data);
-        setRequests(data);
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoading(false);
-      }
-    };
+      console.log("Loading data for:", currentUserEmail, data);
+      setRequests(data);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredRequests = useMemo(() => {
     if (!searchTerm.trim()) {
@@ -85,11 +116,18 @@ const L1ApproverDashboard = () => {
       const fileUrl = req.approvalDetails?.FileURL;
       if (!fileUrl) return false;
       
-    
       const fileName = decodeURIComponent(fileUrl.split('/').pop() || '');
       return fileName.toLowerCase().includes(lowerSearchTerm);
     });
   }, [requests, searchTerm]);
+
+  // Function to refresh counts when a request is approved/rejected
+  const handleRequestActionComplete = () => {
+    void loadRequests(); // Reload current tab
+    if (currentUserEmail) {
+      void fetchAllTabCounts(currentUserEmail); // Refresh all counts
+    }
+  };
 
   return (
     <div className={styles.container}>
@@ -98,6 +136,11 @@ const L1ApproverDashboard = () => {
           title="Approvals"
           activeTabForApprover={activeTab}
           onTabChangeForApprover={setActiveTab}
+          // Pass the counts to Header component
+          pendingCount={tabCounts.pending}
+          approvedCount={tabCounts.approved}
+          rejectedCount={tabCounts.rejected}
+          totalCount={tabCounts.totalRequests}
         />
         <div className={styles.searchBar}>
           <Search size={18} className={styles.searchIcon} />
@@ -128,7 +171,7 @@ const L1ApproverDashboard = () => {
                 <ApprovalCard 
                   request={req}
                   status={activeTab}
-                  onActionCompleted={loadRequests}
+                  onActionCompleted={handleRequestActionComplete}
                 />
               </Col>
             ))
@@ -142,5 +185,4 @@ const L1ApproverDashboard = () => {
     </div>
   );
 };
-
 export default L1ApproverDashboard;

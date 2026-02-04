@@ -14,7 +14,8 @@ const Header: React.FC<IHeaderProps> = ({
     rejectedCount = 0,
     totalCount = 0,
     activeTabForApprover,
-    onTabChangeForApprover
+    onTabChangeForApprover,
+    approvedCount = 0 // Add this prop
 }) => {
     return (
         <header className={styles.header}>
@@ -65,21 +66,25 @@ const Header: React.FC<IHeaderProps> = ({
                             className={`${styles.pillTab} ${activeTabForApprover === 'pending' ? styles.activePill : ''}`}
                             onClick={() => onTabChangeForApprover('pending')} >
                             Pending
+                            <span className={styles.pillCount}>{pendingCount}</span>
                         </button>
                         <button
                             className={`${styles.pillTab} ${activeTabForApprover === 'approved' ? styles.activePill : ''}`}
                             onClick={() => onTabChangeForApprover('approved')} >
                             Approved
+                            <span className={styles.pillCount}>{approvedCount}</span>
                         </button>
                         <button
                             className={`${styles.pillTab} ${activeTabForApprover === 'rejected' ? styles.activePill : ''}`}
                             onClick={() => onTabChangeForApprover('rejected')}>
                             Rejected
+                            <span className={styles.pillCount}>{rejectedCount}</span>
                         </button>
                          <button
                             className={`${styles.pillTab} ${activeTabForApprover === 'totalRequests' ? styles.activePill : ''}`}
                             onClick={() => onTabChangeForApprover('totalRequests')}>
                             Total Requests
+                            <span className={styles.pillCount}>{totalCount}</span>
                         </button> 
                     </div>
                 )}

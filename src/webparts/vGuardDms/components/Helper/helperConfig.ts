@@ -16,6 +16,7 @@ export interface IHeaderProps {
     totalCount?: number;
     activeTabForApprover?: 'pending' | 'approved' |  'rejected' | 'totalRequests';
     onTabChangeForApprover?: (tab: 'pending' | 'approved' |  'rejected' | 'totalRequests') => void;
+    approvedCount?: number;
 }
 
 // Breadcrumb Service Details .............
