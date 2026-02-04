@@ -108,7 +108,7 @@ const ApprovalCardDetails: React.FC<ApprovalCardDetailsProps> = ({
       action: 'Approve',
       comments: 'Approved'
     });
-    onActionCompleted();
+  
 
   };
 
@@ -127,7 +127,8 @@ const ApprovalCardDetails: React.FC<ApprovalCardDetailsProps> = ({
     });
 
      setOpenRejectModal(false);
-
+     onActionCompleted();
+     onClose(); 
   };
 
   const requestedDate = DateFormatter.formatDate(approvalDetails.Created);
@@ -170,6 +171,7 @@ const ApprovalCardDetails: React.FC<ApprovalCardDetailsProps> = ({
               open={openApproveModal}
               onConfirm={handleApproveConfirm}
               onCancel={() => setOpenApproveModal(false)}
+              onCompleted={onActionCompleted}
             />
           </div>
         ) : null

@@ -9,9 +9,12 @@ import { createDMSRequest } from '../MyRequest/service';
 import {
     DefaultButton, Dialog, DialogType, DialogFooter,
     PrimaryButton, Spinner, SpinnerSize,
-    MessageBar, MessageBarType
+    MessageBar, MessageBarType,
+    Dropdown
 } from '@fluentui/react';
 import moment from 'moment';
+import { DocsLibraryService } from '../DocService/DocsService';
+
 
 const UploadModal: React.FC<IUploadModalProps> = ({
     isOpen,
@@ -231,6 +234,7 @@ const UploadModal: React.FC<IUploadModalProps> = ({
                             ? moment(dynamicValues[fieldId]).format('YYYY-MM-DD')
                             : (dynamicValues[fieldId] as string) || ''
                     }
+                    min={fieldId === 'ER' ? moment().format('YYYY-MM-DD') : undefined}
                     onChange={(e) =>
                         setDynamicValues(prev => ({
                             ...prev,
@@ -282,11 +286,12 @@ const UploadModal: React.FC<IUploadModalProps> = ({
             console.log('Uploading to folder:', folderPath);
 
             const folder = sp.web.getFolderByServerRelativePath(folderPath);
+             const docsLibraryService = new DocsLibraryService(sp);
 
-            const uploadResult = await folder.files.addUsingPath(
+            const uploadResult = await docsLibraryService.uploadFile(
+                folderPath,
                 selectedFile.name,
-                selectedFile,
-                { Overwrite: true }
+                selectedFile
             )
 
             const fileUrl = uploadResult.ServerRelativeUrl;
@@ -347,7 +352,8 @@ const UploadModal: React.FC<IUploadModalProps> = ({
 
         } catch (error: any) {
             console.log("Upload error", error);
-            setError(error.message);
+            setError(error?.message || 
+                 "Something went wrong while uploading. Please try again.");
             setUploadStatus('error');
             setUploading(false);
         }
@@ -387,19 +393,14 @@ const UploadModal: React.FC<IUploadModalProps> = ({
                 Document Type <span style={{ color: "red"}}> * </span>
           </label>
 
-          <select
-            className={styles.departmentDropdown}
-            value={documentType}
-            onChange={(e) => handleDocumentTypeChange(e.target.value)}
-            disabled={uploading}
-          >
-             
-             <option value="" disabled hidden>Select Document Type</option>
-            {docTypeChoices.map(choice => (
-               <option key={choice} value={choice}>{choice}</option>
-             ))}
-          </select>
-
+          <Dropdown
+                placeholder="Select Document Type"
+               options={docTypeChoices.map(choice => ({ key: choice, text: choice }))}
+               selectedKey={documentType || undefined}
+               onChange={(e, option) => handleDocumentTypeChange(option?.key as string)}
+               disabled={uploading}
+               styles={{ dropdown: { width: '50%' , marginTop: '10px', marginLeft: '10px'} }}
+        />
             <input
                 ref={fileInputRef}
                 type="file"

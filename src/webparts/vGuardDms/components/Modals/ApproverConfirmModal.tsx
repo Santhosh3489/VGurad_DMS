@@ -8,12 +8,14 @@ interface ApprovalConfirmModalProps {
   open: boolean;
   onConfirm: () => Promise<void>;
   onCancel: () => void;
+  onCompleted: () => void;
 }
 
 const ApprovalConfirmModal: React.FC<ApprovalConfirmModalProps> = ({
   open,
   onConfirm,
-  onCancel
+  onCancel,
+  onCompleted
 }) => {
   const [isApproved, setIsApproved] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
@@ -42,6 +44,17 @@ const ApprovalConfirmModal: React.FC<ApprovalConfirmModalProps> = ({
     setIsApproved(false);
     onCancel();
   };
+
+  React.useEffect(() => {
+  if (isApproved) {
+    const timer = setTimeout(() => {
+      onCompleted(); // ✅ refresh AFTER animation
+      handleClose();
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }
+}, [isApproved])
 
  
   React.useEffect(() => {
